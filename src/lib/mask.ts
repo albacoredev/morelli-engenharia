@@ -1,13 +1,27 @@
 import IMask from 'imask';
 
-const cnpjMask = (node: HTMLInputElement, mask: string) => {
-	const masked = IMask.createMask({
-		mask
-	});
+type MaskOptions = IMask.AnyMaskedOptions | string | RegExp;
+
+function createMask(mask: MaskOptions) {
+	let options: IMask.AnyMaskedOptions;
+
+	if (typeof mask === 'string') {
+		options = { mask };
+	} else if (mask instanceof RegExp) {
+		options = { mask };
+	} else {
+		options = mask;
+	}
+
+	return IMask.createMask(options);
+}
+
+const masked = (node: HTMLInputElement, mask: MaskOptions) => {
+	const maskObject = createMask(mask);
 
 	const handleInput = () => {
 		if (node && typeof node.select === 'function') {
-			node.value = masked.resolve(node.value);
+			node.value = maskObject.resolve(node.value);
 		}
 	};
 
@@ -20,4 +34,4 @@ const cnpjMask = (node: HTMLInputElement, mask: string) => {
 	};
 };
 
-export default cnpjMask;
+export default masked;
