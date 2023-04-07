@@ -1,13 +1,10 @@
-// suite.js
-import { create, test, enforce } from 'vest';
+import { create, test, enforce, only } from 'vest';
 
-const suite = create((data = {}) => {
-	test('username', 'Username is required', () => {
-		enforce(data.username).isNotBlank();
-	});
+const suite = create((data = {}, current?: string) => {
+	current && only(current);
 
-	test('username', 'Username must be at least 3 characters long', () => {
-		enforce(data.username).longerThan(2);
+	test('cnpj', 'Username is required', () => {
+		enforce(data.cnpj).isNotBlank();
 	});
 });
 

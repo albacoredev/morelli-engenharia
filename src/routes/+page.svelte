@@ -1,14 +1,10 @@
-<script lang="ts">
+<script>
+	import Input from '$lib/components/Input.svelte';
 	import suite from '$lib/vestSuites/suite';
-	import mask from '$lib/mask';
 
-	console.log(
-		suite({
-			username: ''
-		})
-	);
+	let form = {
+		cnpj: ''
+	};
 </script>
 
-<h1 class="text-3xl font-bold underline">Hello world!</h1>
-<button class="btn btn-primary">Button</button>
-<input type="text" use:mask={'00.000.000/0000-00'} />
+<Input mask={'000.000/0000-00'} placeholder={'CNPJ'} bind:form {suite} name="cnpj" />
