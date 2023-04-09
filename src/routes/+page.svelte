@@ -1,14 +1,39 @@
 <script lang="ts">
+	import Input from '$lib/components/Input.svelte';
+	import Radio from '$lib/components/Radio.svelte';
 	import suite from '$lib/vestSuites/suite';
-	import mask from '$lib/mask';
 
-	console.log(
-		suite({
-			username: ''
-		})
-	);
+	let result = suite.get();
+
+	let form = {
+		cnpj: '',
+		radio: ''
+	};
+
+	const validate = (name: string) => {
+		result = suite(form, name);
+	};
 </script>
 
-<h1 class="text-3xl font-bold underline">Hello world!</h1>
-<button class="btn btn-primary">Button</button>
-<input type="text" use:mask={'00.000.000/0000-00'} />
+<Input
+	mask={'000.000/0000-00'}
+	placeholder={'CNPJ'}
+	bind:value={form.cnpj}
+	bind:result
+	name="cnpj"
+	{validate}
+/>
+<Radio
+	options={[
+		{ value: 'radio-1', label: 'Radio 1' },
+		{ value: 'radio-2', label: 'Radio 2' }
+	]}
+	name="radio"
+	bind:result
+	bind:selected={form.radio}
+	{validate}
+/>
+
+{#each Object.values(form) as value}
+	{value} <br />
+{/each}
