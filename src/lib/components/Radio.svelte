@@ -11,10 +11,11 @@
 	export let validate: (name: string) => void;
 	export let name: string;
 	export let selected: string;
+	export let label: string;
 </script>
 
 <div>
-	<span class="label">Choose</span>
+	<span class="label font-semibold">{label}</span>
 	{#if result.getErrors()[name]}
 		<span class="label label-text-alt text-error">{result.getErrors()[name][0]}</span>
 	{/if}

@@ -32,6 +32,7 @@
 	bind:result
 	bind:selected={form.radio}
 	{validate}
+	label="radio"
 />
 
 {#each Object.values(form) as value}
