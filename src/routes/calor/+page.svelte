@@ -36,12 +36,13 @@
 
 	let result = suite.get();
 
-	const validate = (name: string) => {
-		result = suite(form, name);
+	const validate = (name?: string) => {
+		result = suite(form, name ?? undefined);
 	};
 
 	const handleSubmit = () => {
 		console.log(form);
+		validate();
 	};
 
 	const hmsToSeconds = (s: string) => {
