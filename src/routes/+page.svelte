@@ -24,10 +24,7 @@
 	{validate}
 />
 <Radio
-	options={[
-		{ value: 'radio-1', label: 'Radio 1' },
-		{ value: 'radio-2', label: 'Radio 2' }
-	]}
+	options={['option 1', 'option 2']}
 	name="radio"
 	bind:result
 	bind:selected={form.radio}
