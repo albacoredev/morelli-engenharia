@@ -9,16 +9,18 @@
 	export let result: SuiteResult;
 	export let validate: (name: string) => void;
 	export let type: 'text' | 'textArea' = 'text';
+	export let disabled = false;
 </script>
 
-<div class="form-control w-full max-w-xs">
+<div class="form-control w-full py-2">
 	{#if type === 'textArea'}
 		<textarea
 			{placeholder}
 			{name}
-			class="textarea textarea-bordered textarea-primary w-full max-w-xs"
+			class="textarea textarea-bordered textarea-primary w-full"
 			bind:value
 			on:input={() => validate(name)}
+			{disabled}
 		/>
 	{:else if type === 'text'}
 		<input
@@ -26,9 +28,10 @@
 			{name}
 			{placeholder}
 			use:masked={mask}
-			class="input input-bordered input-primary w-full max-w-xs"
+			class="input input-bordered input-primary w-full"
 			bind:value
 			on:input={() => validate(name)}
+			{disabled}
 		/>
 	{/if}
 	{#if result.getErrors()[name]}
