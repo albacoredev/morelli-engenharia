@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { SuiteResult } from 'vest';
+	import classnames from 'vest/classnames';
 
 	export let options: string[];
 	export let result: SuiteResult;
@@ -7,6 +8,12 @@
 	export let name: string;
 	export let selected: string;
 	export let label: string;
+
+	$: cn = classnames(result, {
+		untested: 'primary',
+		valid: 'primary',
+		invalid: 'error'
+	})(name);
 </script>
 
 <div class="py-2">
@@ -23,7 +30,7 @@
 					<input
 						type="radio"
 						{name}
-						class="radio radio-primary"
+						class={`radio radio-${cn}`}
 						bind:group={selected}
 						value={option}
 						on:change|self={() => validate(name)}

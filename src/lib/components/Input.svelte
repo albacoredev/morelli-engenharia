@@ -1,6 +1,7 @@
 <script lang="ts">
 	import masked from '$lib/mask';
 	import type { SuiteResult } from 'vest';
+	import classnames from 'vest/classnames';
 
 	export let mask: string | RegExp = '';
 	export let placeholder = '';
@@ -10,6 +11,12 @@
 	export let validate: (name: string) => void;
 	export let type: 'text' | 'textArea' = 'text';
 	export let disabled = false;
+
+	$: cn = classnames(result, {
+		untested: 'primary',
+		valid: 'primary',
+		invalid: 'error'
+	})(name);
 </script>
 
 <div class="form-control w-full py-2">
@@ -17,7 +24,7 @@
 		<textarea
 			{placeholder}
 			{name}
-			class="textarea textarea-bordered textarea-primary w-full"
+			class={`textarea textarea-bordered textarea-${cn} w-full`}
 			bind:value
 			on:input={() => validate(name)}
 			{disabled}
@@ -28,7 +35,7 @@
 			{name}
 			{placeholder}
 			use:masked={mask}
-			class="input input-bordered input-primary w-full"
+			class={`input input-bordered input-${cn} w-full`}
 			bind:value
 			on:input={() => validate(name)}
 			{disabled}
