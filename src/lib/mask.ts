@@ -17,6 +17,8 @@ function createMask(mask: MaskOptions) {
 }
 
 const masked = (node: HTMLInputElement, mask: MaskOptions) => {
+	if (mask === '') return;
+
 	const maskObject = createMask(mask);
 
 	const handleInput = () => {
