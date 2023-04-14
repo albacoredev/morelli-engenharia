@@ -91,7 +91,7 @@
 			</button>
 		</div>
 		<div class="flex-1">
-			<span class="text-secondary font-bold normal-case text-xl"
+			<span class="text-base-content font-bold normal-case text-xl"
 				>Avaliação Quantitativa de Calor</span
 			>
 		</div>
