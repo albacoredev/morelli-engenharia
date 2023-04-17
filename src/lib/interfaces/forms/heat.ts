@@ -20,9 +20,9 @@ export default interface IHeatForm {
 	heatSource: string;
 	rest: 'No mesmo local' | 'Outro ambiente' | '';
 	activities: 'Leve' | 'Moderada' | 'Pesada' | '';
-	temperature: string;
-	humidity: string;
-	wind: string;
+	temperature?: string;
+	humidity?: string;
+	wind?: string;
 	startingTime: string;
 	endingTime: string;
 	totalTime: string;

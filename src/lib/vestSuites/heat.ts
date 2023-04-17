@@ -98,7 +98,7 @@ const suite = create((data: IHeatForm, current?: string) => {
 		enforce(data.startingTime).isNotEmpty();
 	});
 
-	test('startingTime', 'Data inválida', () => {
+	test('startingTime', 'Horário inválido', () => {
 		enforce(data.startingTime).matches(/^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/);
 	});
 
@@ -106,8 +106,12 @@ const suite = create((data: IHeatForm, current?: string) => {
 		enforce(data.endingTime).isNotEmpty();
 	});
 
-	test('endingTime', 'Data inválida', () => {
+	test('endingTime', 'Horário inválido', () => {
 		enforce(data.endingTime).matches(/^([0-1]\d|2[0-3]):([0-5]\d):([0-5]\d)$/);
+	});
+
+	test('endingTime', 'Horário menor que o inicial', () => {
+		enforce(data.endingTime.slice(0, 2)).greaterThanOrEquals(data.startingTime.slice(0, 2));
 	});
 });
 
