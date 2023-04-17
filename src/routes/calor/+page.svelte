@@ -2,6 +2,7 @@
 	import Input from '$lib/components/Input.svelte';
 	import Radio from '$lib/components/Radio.svelte';
 	import type IHeatForm from '$lib/interfaces/forms/heat';
+	import getTotalTime from '$lib/utils/getTotalTime';
 	import suite from '$lib/vestSuites/heat';
 
 	let form: IHeatForm = {
@@ -43,30 +44,6 @@
 	const handleSubmit = () => {
 		console.log(form);
 		validate();
-	};
-
-	const hmsToSeconds = (s: string) => {
-		let b = s.split(':');
-		return +b[0] * 3600 + +b[1] * 60 + (+b[2] || 0);
-	};
-
-	const getTotalTime = (start: string, end: string) => {
-		const error = start.length < 8 || end.length < 8;
-
-		if (!error) {
-			const startingTime = hmsToSeconds(start);
-			const endingTime = hmsToSeconds(end);
-			const totalTime = endingTime - startingTime;
-			let hours = Math.floor(totalTime / 3600);
-			let minutes = Math.floor((totalTime - hours * 3600) / 60);
-			let seconds = totalTime - hours * 3600 - minutes * 60;
-
-			return `${hours < 10 ? `0${hours}` : hours}:${minutes < 10 ? `0${minutes}` : minutes}:${
-				seconds < 10 ? `0${seconds}` : seconds
-			}`;
-		} else {
-			return '00:00:00';
-		}
 	};
 
 	$: form.totalTime = getTotalTime(form.startingTime, form.endingTime);
