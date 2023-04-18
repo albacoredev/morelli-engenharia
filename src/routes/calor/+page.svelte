@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import Input from '$lib/components/Input.svelte';
 	import Radio from '$lib/components/Radio.svelte';
 	import type IHeatForm from '$lib/interfaces/forms/heat';
 	import getTotalTime from '$lib/utils/getTotalTime';
 	import suite from '$lib/vestSuites/heat';
+	import { Timestamp } from 'firebase/firestore';
 
 	let form: IHeatForm = {
 		company: '',
@@ -41,9 +43,20 @@
 		result = suite(form, name ?? undefined);
 	};
 
-	const handleSubmit = () => {
-		console.log(form);
-		validate();
+	const handleSubmit = async () => {
+		if (browser) {
+			const { addValuation } = await import('$lib/firebase/addDoc/valuations');
+
+			addValuation({
+				meta: {
+					createdAt: Timestamp.fromDate(new Date()),
+					updatedAt: Timestamp.fromDate(new Date()),
+					createdBy: 'user',
+					type: 'heat'
+				},
+				data: form
+			});
+		}
 	};
 
 	$: form.totalTime = getTotalTime(form.startingTime, form.endingTime);
