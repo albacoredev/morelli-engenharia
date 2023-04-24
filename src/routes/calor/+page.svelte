@@ -45,7 +45,7 @@
 
 	const handleSubmit = async () => {
 		if (browser) {
-			const { addValuation } = await import('$lib/firebase/addDoc/valuations');
+			const { addValuation } = await import('$lib/firebase/valuations');
 
 			addValuation({
 				meta: {
