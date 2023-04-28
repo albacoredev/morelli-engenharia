@@ -5,13 +5,14 @@
 	export let mask: string | RegExp = '';
 	export let placeholder = '';
 	export let value: string = '';
-	export let name = '';
-	export let result: SuiteResult;
-	export let validate: (name: string) => void;
+	export let name: string;
 	export let type: 'text' | 'textArea' = 'text';
 	export let disabled = false;
 
-	$: error = result.getErrors()[name]?.length > 0;
+	export let result: SuiteResult | undefined = undefined;
+	export let validate: ((name: string) => void) | (() => {}) = () => {};
+
+	$: error = result?.getErrors()[name]?.length ?? 0 > 0;
 </script>
 
 <div class="form-control w-full py-2">
@@ -40,7 +41,8 @@
 			{disabled}
 		/>
 	{/if}
-	{#if result.getErrors()[name]}
+
+	{#if result && result.getErrors()[name]}
 		<label class="label" for={placeholder}>
 			<span class="label-text-alt text-error">{result.getErrors()[name][0]}</span>
 		</label>
