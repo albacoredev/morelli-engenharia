@@ -14,5 +14,4 @@
 	});
 </script>
 
-<button class="btn" on:click={signOut}>Signout</button>
 <slot />
