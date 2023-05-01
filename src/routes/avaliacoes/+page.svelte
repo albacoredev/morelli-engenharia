@@ -1,3 +1,19 @@
+<script lang="ts">
+	import { userStore } from '$lib/store';
+	import type { User } from 'firebase/auth';
+	import { onMount } from 'svelte';
+
+	let currentUser: User | null = null;
+
+	onMount(async () => {
+		const { auth } = await import('$lib/firebase/firebase');
+
+		userStore(auth).subscribe((user) => {
+			currentUser = user;
+		});
+	});
+</script>
+
 <div class="navbar bg-base-100">
 	<div class="flex-none">
 		<a href="./home">
@@ -24,13 +40,12 @@
 		</a>
 	</div>
 	<div class="flex-1">
-		<span class="normal-case text-xl px-4">daisyUI</span>
+		<span class="normal-case text-xl px-4">Avaliações de {currentUser?.displayName}</span>
 	</div>
 </div>
 
 <div class="overflow-x-auto">
 	<table class="table w-full">
-		<!-- head -->
 		<thead>
 			<tr>
 				<th />
