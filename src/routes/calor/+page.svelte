@@ -60,6 +60,8 @@
 	const handleSubmit = async () => {
 		result = suite(form);
 
+		if (result.hasErrors()) return;
+
 		if (browser) {
 			if (!currentUser) return;
 
