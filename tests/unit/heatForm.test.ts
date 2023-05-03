@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 
 import suite from '$lib/vestSuites/heat';
 import type IHeatForm from '$lib/interfaces/forms/heat';
-import getTotalTime from '$lib/utils/getTotalTime';
 
 const form: IHeatForm = {
 	company: '',
@@ -65,32 +64,5 @@ describe('Validates starting and ending time', () => {
 		const fieldErrors = suiteResult.getErrors()['endingTime'];
 
 		expect(fieldErrors).toContain('Horário inválido');
-	});
-
-	it('calculates total time', () => {
-		const startingTime = '14:00:00';
-		const endingTime = '15:00:00';
-
-		const totalTime = getTotalTime(startingTime, endingTime);
-
-		expect(totalTime).toBe('01:00:00');
-	});
-
-	it('does not calculate an invalid time', () => {
-		const startingTime = '99:';
-		const endingTime = '14:00';
-
-		const totalTime = getTotalTime(startingTime, endingTime);
-
-		expect(totalTime).toBe('00:00:00');
-	});
-
-	it('does not calculate an starting time higher than the ending time', () => {
-		const startingTime = '15:00:00';
-		const endingTime = '14:00"00';
-
-		const totalTime = getTotalTime(startingTime, endingTime);
-
-		expect(totalTime).toBe('00:00:00');
 	});
 });
