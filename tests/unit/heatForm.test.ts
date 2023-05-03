@@ -40,33 +40,57 @@ describe('Validates empty fields', () => {
 
 	for (const field in requieredFields) {
 		it(`validates an empty ${field} field`, () => {
-			expect(suite(form).getErrors()[field]).toContain('Campo obrigatório');
+			const suiteResult = suite(form);
+			const fieldErrors = suiteResult.getErrors()[field];
+
+			expect(fieldErrors).toContain('Campo obrigatório');
 		});
 	}
 });
 
 describe('Validates starting and ending time', () => {
 	it('validates an invalid starting time', () => {
-		expect(suite({ ...form, startingTime: '99:99:99' }).getErrors()['startingTime']).toContain(
-			'Horário inválido'
-		);
+		const mockForm = { ...form, startingTime: '99:99:99' };
+
+		const suiteResult = suite(mockForm);
+		const fieldErrors = suiteResult.getErrors()['startingTime'];
+
+		expect(fieldErrors).toContain('Horário inválido');
 	});
 
 	it('validates an invalid ending time', () => {
-		expect(suite({ ...form, endingTime: '99:99:99' }).getErrors()['endingTime']).toContain(
-			'Horário inválido'
-		);
+		const mockForm = { ...form, endingTime: '99:99:99' };
+
+		const suiteResult = suite(mockForm);
+		const fieldErrors = suiteResult.getErrors()['endingTime'];
+
+		expect(fieldErrors).toContain('Horário inválido');
 	});
 
 	it('calculates total time', () => {
-		expect(getTotalTime('13:00:00', '14:00:00')).toBe('01:00:00');
+		const startingTime = '14:00:00';
+		const endingTime = '15:00:00';
+
+		const totalTime = getTotalTime(startingTime, endingTime);
+
+		expect(totalTime).toBe('01:00:00');
 	});
 
 	it('does not calculate an invalid time', () => {
-		expect(getTotalTime('99:', '14:00')).toBe('00:00:00');
+		const startingTime = '99:';
+		const endingTime = '14:00';
+
+		const totalTime = getTotalTime(startingTime, endingTime);
+
+		expect(totalTime).toBe('00:00:00');
 	});
 
 	it('does not calculate an starting time higher than the ending time', () => {
-		expect(getTotalTime('18:00:00', '14:00:00')).toBe('00:00:00');
+		const startingTime = '15:00:00';
+		const endingTime = '14:00"00';
+
+		const totalTime = getTotalTime(startingTime, endingTime);
+
+		expect(totalTime).toBe('00:00:00');
 	});
 });

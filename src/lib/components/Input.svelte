@@ -1,13 +1,14 @@
 <script lang="ts">
-	import masked from '$lib/mask';
+	import masked from '$lib/utils/mask';
 	import type { SuiteResult } from 'vest';
 
 	export let mask: string | RegExp = '';
 	export let placeholder = '';
 	export let value: string = '';
 	export let name: string;
-	export let type: 'text' | 'textArea' = 'text';
+	export let type: 'text' | 'textArea' | 'password' = 'text';
 	export let disabled = false;
+	export let autocomplete = 'off';
 
 	export let result: SuiteResult | undefined = undefined;
 	export let validate: ((name: string) => void) | (() => {}) = () => {};
@@ -26,6 +27,7 @@
 			bind:value
 			on:input={() => validate(name)}
 			{disabled}
+			{autocomplete}
 		/>
 	{:else if type === 'text'}
 		<input
@@ -39,6 +41,21 @@
 			bind:value
 			on:input={() => validate(name)}
 			{disabled}
+			{autocomplete}
+		/>
+	{:else if type === 'password'}
+		<input
+			type="password"
+			{name}
+			{placeholder}
+			use:masked={mask}
+			class="input input-bordered w-full"
+			class:input-error={error}
+			class:input-primary={!error}
+			bind:value
+			on:input={() => validate(name)}
+			{disabled}
+			{autocomplete}
 		/>
 	{/if}
 
