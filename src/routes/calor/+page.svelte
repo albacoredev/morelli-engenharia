@@ -58,6 +58,8 @@
 	};
 
 	const handleSubmit = async () => {
+		result = suite(form);
+
 		if (browser) {
 			if (!currentUser) return;
 
