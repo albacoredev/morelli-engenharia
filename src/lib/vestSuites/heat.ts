@@ -1,4 +1,5 @@
 import type IHeatForm from '$lib/interfaces/forms/heat';
+import hmsToSeconds from '$lib/utils/hmsToSeconds';
 import { create, test, enforce, only } from 'vest';
 
 const requiredFields: (keyof IHeatForm)[] = [
@@ -46,7 +47,7 @@ const suite = create((data: IHeatForm, current?: string) => {
 	});
 
 	test('endingTime', 'Horário menor que o inicial', () => {
-		enforce(data.endingTime.slice(0, 2)).greaterThanOrEquals(data.startingTime.slice(0, 2));
+		enforce(hmsToSeconds(data.endingTime)).greaterThanOrEquals(hmsToSeconds(data.startingTime));
 	});
 });
 

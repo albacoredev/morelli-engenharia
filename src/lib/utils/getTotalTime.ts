@@ -1,14 +1,14 @@
-const hmsToSeconds = (s: string) => {
-	const b = s.split(':');
-	return +b[0] * 3600 + +b[1] * 60 + (+b[2] || 0);
-};
+import hmsToSeconds from './hmsToSeconds';
 
 export default function getTotalTime(start: string, end: string) {
-	const error = start.length < 8 || end.length < 8 || start.slice(0, 2) > end.slice(0, 2);
+	const error = start.length < 8 || end.length < 8;
 
 	if (!error) {
 		const startingTime = hmsToSeconds(start);
 		const endingTime = hmsToSeconds(end);
+
+		if (startingTime > endingTime) return '00:00:00';
+
 		const totalTime = endingTime - startingTime;
 		const hours = Math.floor(totalTime / 3600);
 		const minutes = Math.floor((totalTime - hours * 3600) / 60);
