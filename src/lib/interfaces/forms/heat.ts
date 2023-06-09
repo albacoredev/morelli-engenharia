@@ -27,3 +27,33 @@ export default interface IHeatForm {
 	endingTime: string;
 	totalTime: string;
 }
+
+export enum HeatFormLabels {
+	company = 'Empresa',
+	date = 'Data',
+	sampleNumber = 'Número da amostragem',
+	valuation = 'Avaliação',
+	methodology = 'Metodologia',
+	name = 'Nome',
+	function = 'Função',
+	sector = 'Setor',
+	ghe = 'GHE',
+	epi = 'EPI',
+	epc = 'EPC',
+	brand = 'Marca',
+	model = 'Modelo',
+	serialNumber = 'Número de série',
+	climaticConditions = 'Condições climáticas',
+	environment = 'Ambiente',
+	ventilation = 'Ventilação',
+	enviromentSolarIncidence = 'Ambiente',
+	heatSource = 'Fonte de calor',
+	rest = 'Descanso',
+	activities = 'Atividades',
+	temperature = 'Temperatura',
+	humidity = 'Umidade',
+	wind = 'Vento',
+	startingTime = 'Hora de início',
+	endingTime = 'Hora de término',
+	totalTime = 'Tempo total'
+}
