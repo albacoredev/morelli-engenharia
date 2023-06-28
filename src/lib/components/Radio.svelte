@@ -3,7 +3,6 @@
 
 	export let options: string[];
 	export let result: SuiteResult;
-	export let validate: (name: string) => void;
 	export let name: string;
 	export let selected: string;
 	export let label: string;
@@ -30,7 +29,6 @@
 						class:radio-primary={!error}
 						bind:group={selected}
 						value={option}
-						on:change|self={() => validate(name)}
 					/>
 					<span class="label-text">{option}</span>
 				</label>

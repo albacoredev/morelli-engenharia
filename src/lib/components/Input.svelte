@@ -11,7 +11,6 @@
 	export let autocomplete = 'off';
 
 	export let result: SuiteResult | undefined = undefined;
-	export let validate: ((name: string) => void) | (() => {}) = () => {};
 
 	$: error = result?.getErrors()[name]?.length ?? 0 > 0;
 </script>
@@ -25,7 +24,6 @@
 			class:textarea-error={error}
 			class:textarea-primary={!error}
 			bind:value
-			on:input={() => validate(name)}
 			{disabled}
 			{autocomplete}
 		/>
@@ -39,7 +37,6 @@
 			class:input-error={error}
 			class:input-primary={!error}
 			bind:value
-			on:input={() => validate(name)}
 			{disabled}
 			{autocomplete}
 		/>
@@ -53,7 +50,6 @@
 			class:input-error={error}
 			class:input-primary={!error}
 			bind:value
-			on:input={() => validate(name)}
 			{disabled}
 			{autocomplete}
 		/>

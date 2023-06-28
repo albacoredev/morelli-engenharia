@@ -3,13 +3,15 @@
 	import Input from '$lib/components/Input.svelte';
 	import Radio from '$lib/components/Radio.svelte';
 	import type IHeatForm from '$lib/interfaces/forms/heat';
-	import { HeatFormLabels } from '$lib/interfaces/forms/heat';
+	import { HeatFormIndexes } from '$lib/interfaces/forms/heat';
 	import { userStore } from '$lib/store';
 	import getTotalTime from '$lib/utils/getTotalTime';
 	import suite from '$lib/vestSuites/heat';
 	import type { User } from 'firebase/auth';
 	import { onMount } from 'svelte';
-	import { jsPDF } from 'jspdf';
+	import { goto } from '$app/navigation';
+	import { Timestamp } from 'firebase/firestore';
+	import { generatePdf } from '$lib/utils/generatePdf';
 
 	let currentUser: User | null = null;
 
@@ -21,77 +23,57 @@
 		});
 	});
 
-	const formSections = [
+	let form: IHeatForm = [
 		{
-			name: 'Dados do Colaborador',
-			fields: [
-				HeatFormLabels.name,
-				HeatFormLabels.function,
-				HeatFormLabels.sector,
-				HeatFormLabels.ghe,
-				HeatFormLabels.epi,
-				HeatFormLabels.epc
-			]
+			name: 'header',
+			fields: {
+				company: '',
+				date: '',
+				sampleNumber: '',
+				valuation: '',
+				methodology: ''
+			}
 		},
 		{
-			name: 'Características dos Equipamentos de Trabalho',
-			fields: [HeatFormLabels.brand, HeatFormLabels.model, HeatFormLabels.serialNumber]
+			name: 'employeeData',
+			fields: {
+				name: '',
+				function: '',
+				sector: '',
+				ghe: '',
+				epi: '',
+				epc: ''
+			}
 		},
 		{
-			name: 'Dados da Amostragem',
-			fields: [
-				HeatFormLabels.climaticConditions,
-				HeatFormLabels.environment,
-				HeatFormLabels.ventilation,
-				HeatFormLabels.enviromentSolarIncidence,
-				HeatFormLabels.heatSource,
-				HeatFormLabels.rest,
-				HeatFormLabels.activities,
-				HeatFormLabels.temperature,
-				HeatFormLabels.humidity,
-				HeatFormLabels.wind,
-				HeatFormLabels.startingTime,
-				HeatFormLabels.endingTime,
-				HeatFormLabels.totalTime
-			]
+			name: 'equipmentData',
+			fields: {
+				brand: '',
+				model: '',
+				serialNumber: ''
+			}
+		},
+		{
+			name: 'sampleData',
+			fields: {
+				climaticConditions: '',
+				environment: '',
+				ventilation: '',
+				enviromentSolarIncidence: '',
+				heatSource: '',
+				rest: '',
+				activities: '',
+				temperature: '',
+				humidity: '',
+				wind: '',
+				startingTime: '',
+				endingTime: '',
+				totalTime: ''
+			}
 		}
 	];
 
-	let form: IHeatForm = {
-		company: '',
-		date: '',
-		sampleNumber: '',
-		valuation: '',
-		methodology: '',
-		name: '',
-		function: '',
-		sector: '',
-		ghe: '',
-		epi: '',
-		epc: '',
-		brand: '',
-		model: '',
-		serialNumber: '',
-		climaticConditions: '',
-		environment: '',
-		ventilation: '',
-		enviromentSolarIncidence: '',
-		heatSource: '',
-		rest: '',
-		activities: '',
-		temperature: '',
-		humidity: '',
-		wind: '',
-		startingTime: '',
-		endingTime: '',
-		totalTime: ''
-	};
-
 	let result = suite.get();
-
-	const validate = (name?: string) => {
-		result = suite(form, name ?? undefined);
-	};
 
 	const handleSubmit = async () => {
 		result = suite(form);
@@ -99,10 +81,8 @@
 		// if (result.hasErrors()) return;
 
 		if (browser) {
-			if (!currentUser) return;
-
+			// if (!currentUser) return;
 			// const { addValuation } = await import('$lib/firebase/valuations');
-
 			// await addValuation({
 			// 	meta: {
 			// 		createdAt: Timestamp.fromDate(new Date()),
@@ -112,95 +92,16 @@
 			// 	},
 			// 	data: form
 			// });
-
+			// // Generate PDF
 			// goto('/avaliacoes');
-
-			const doc = new jsPDF();
-
-			let fontSize = 15;
-			let lineHeight = fontSize * 0.3;
-			const changeFontSize = (newSize) => {
-				doc.setFontSize(newSize);
-				fontSize = newSize;
-			};
-
-			const pageWidth = doc.internal.pageSize.getWidth();
-			const imageWidth = 58;
-			const imageHeight = 16;
-			const xMargin = 10;
-			const yMargin = 10;
-			const headerHeight = 15 * 6 * 0.3 + yMargin * 2 + 10;
-
-			const title = 'Registro de avaliação quantitativa de calor';
-			const company = 'Empresa XYZ';
-			const date = '01/01/2021';
-			const sampleNumber = '123456';
-			const valuation = 'Individual';
-			const methodology = 'NR-15';
-
-			doc.setFillColor(214, 211, 209);
-			doc.rect(0, 0, pageWidth, headerHeight, 'F');
-
-			doc.addImage({
-				imageData:
-					'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',
-				x: pageWidth - imageWidth - xMargin,
-				y: yMargin,
-				width: imageWidth,
-				height: imageHeight
-			});
-
-			const alignRight = (text) => {
-				const textWidth = doc.getTextWidth(text);
-				const x = pageWidth - textWidth - xMargin;
-
-				return x;
-			};
-
-			changeFontSize(15);
-
-			doc.text(title, xMargin, yMargin + 15 * 0.3);
-			doc.text(company, xMargin, yMargin + 15 * 0.3 * 2 + 2);
-			doc.text(date, xMargin, yMargin + 15 * 0.3 * 3 + 4);
-			doc.text(sampleNumber, xMargin, yMargin + 15 * 0.3 * 4 + 6);
-			doc.text(valuation, xMargin, yMargin + 15 * 0.3 * 5 + 8);
-			doc.text(methodology, xMargin, yMargin + 15 * 0.3 * 6 + 10);
-
-			const sectionMarginTop = 10;
-			const fieldMarginTop = 2;
-
-			let previousHeight = headerHeight;
-
-			formSections.forEach((section) => {
-				changeFontSize(15);
-
-				const { name, fields } = section;
-				const w = doc.getTextWidth(name);
-
-				doc.text(name, xMargin, previousHeight + lineHeight + sectionMarginTop);
-				doc.setLineWidth(0.5);
-				doc.line(
-					w + xMargin + 5,
-					previousHeight + lineHeight + sectionMarginTop,
-					pageWidth - xMargin,
-					previousHeight + lineHeight + sectionMarginTop
-				);
-
-				previousHeight += lineHeight + sectionMarginTop;
-
-				changeFontSize(10);
-
-				fields.forEach((field) => {
-					doc.text(`${field}:`, xMargin, previousHeight + lineHeight + fieldMarginTop);
-					previousHeight += lineHeight + fieldMarginTop;
-				});
-			});
-
-			doc.save('a4.pdf');
+			// generatePdf(form, currentUser?.displayName ?? '', 'heat');
 		}
 	};
 
-	$: form.totalTime = getTotalTime(form.startingTime, form.endingTime);
+	$: form[HeatFormIndexes.sampleData].fields.totalTime = getTotalTime(
+		form[HeatFormIndexes.sampleData].fields.startingTime,
+		form[HeatFormIndexes.sampleData].fields.endingTime
+	);
 </script>
 
 <div class="flex items-center flex-col">
@@ -237,71 +138,78 @@
 	<div class="w-2/3 p-8">
 		<Input
 			placeholder={'Empresa'}
-			bind:value={form.company}
+			bind:value={form[HeatFormIndexes.header].fields.company}
 			bind:result
 			name="company"
-			{validate}
 		/>
 		<Input
 			placeholder={'Data'}
-			bind:value={form.date}
+			bind:value={form[HeatFormIndexes.header].fields.date}
 			bind:result
 			name="date"
-			{validate}
 			mask="00/00/0000"
 		/>
 		<Input
-			placeholder={'Número da Amostragem'}
-			bind:value={form.sampleNumber}
-			bind:result
 			name="sampleNumber"
-			{validate}
+			placeholder={'Número da Amostragem'}
+			bind:value={form[HeatFormIndexes.header].fields.sampleNumber}
+			bind:result
 		/>
 		<Radio
 			options={['Individual', 'Ambiental']}
 			name="valuation"
 			label="Avaliação"
 			bind:result
-			bind:selected={form.valuation}
-			{validate}
+			bind:selected={form[HeatFormIndexes.header].fields.valuation}
 		/>
 		<Radio
 			options={['NR-15', 'NHO-06']}
 			name="methodology"
 			label="Metodologia"
 			bind:result
-			bind:selected={form.methodology}
-			{validate}
+			bind:selected={form[HeatFormIndexes.header].fields.methodology}
 		/>
 
 		<div class="divider py-4">
 			<span class="text-lg text-secondary font-bold">Dados do Colaborador</span>
 		</div>
 
-		<Input placeholder={'Nome'} bind:value={form.name} bind:result name="name" {validate} />
+		<Input
+			placeholder={'Nome'}
+			bind:value={form[HeatFormIndexes.employeeData].fields.name}
+			bind:result
+			name="name"
+		/>
 		<Input
 			placeholder={'Função'}
-			bind:value={form.function}
+			bind:value={form[HeatFormIndexes.employeeData].fields.function}
 			bind:result
 			name="function"
-			{validate}
 		/>
-		<Input placeholder={'Setor'} bind:value={form.sector} bind:result name="sector" {validate} />
-		<Input placeholder={'GHE'} bind:value={form.ghe} bind:result name="ghe" {validate} />
+		<Input
+			placeholder={'Setor'}
+			bind:value={form[HeatFormIndexes.employeeData].fields.sector}
+			bind:result
+			name="sector"
+		/>
+		<Input
+			placeholder={'GHE'}
+			bind:value={form[HeatFormIndexes.employeeData].fields.ghe}
+			bind:result
+			name="ghe"
+		/>
 		<Input
 			placeholder={'EPI'}
-			bind:value={form.epi}
+			bind:value={form[HeatFormIndexes.employeeData].fields.epi}
 			bind:result
 			name="epi"
-			{validate}
 			type="textArea"
 		/>
 		<Input
 			placeholder={'EPC'}
-			bind:value={form.epc}
+			bind:value={form[HeatFormIndexes.employeeData].fields.epc}
 			bind:result
 			name="epc"
-			{validate}
 			type="textArea"
 		/>
 
@@ -311,14 +219,23 @@
 			>
 		</div>
 
-		<Input placeholder={'Marca'} bind:value={form.brand} bind:result name="brand" {validate} />
-		<Input placeholder={'Modelo'} bind:value={form.model} bind:result name="model" {validate} />
+		<Input
+			placeholder={'Marca'}
+			bind:value={form[HeatFormIndexes.equipmentData].fields.brand}
+			bind:result
+			name="brand"
+		/>
+		<Input
+			placeholder={'Modelo'}
+			bind:value={form[HeatFormIndexes.equipmentData].fields.model}
+			bind:result
+			name="model"
+		/>
 		<Input
 			placeholder={'Número de Série'}
-			bind:value={form.serialNumber}
+			bind:value={form[HeatFormIndexes.equipmentData].fields.serialNumber}
 			bind:result
 			name="serialNumber"
-			{validate}
 		/>
 
 		<div class="divider py-4">
@@ -330,8 +247,7 @@
 			name="climaticConditions"
 			label="Condições Climáticas"
 			bind:result
-			bind:selected={form.climaticConditions}
-			{validate}
+			bind:selected={form[HeatFormIndexes.sampleData].fields.climaticConditions}
 		/>
 
 		<Radio
@@ -339,8 +255,7 @@
 			name="environment"
 			label="Ambiente"
 			bind:result
-			bind:selected={form.environment}
-			{validate}
+			bind:selected={form[HeatFormIndexes.sampleData].fields.environment}
 		/>
 
 		<Radio
@@ -348,8 +263,7 @@
 			name="ventilation"
 			label="Ventilação"
 			bind:result
-			bind:selected={form.ventilation}
-			{validate}
+			bind:selected={form[HeatFormIndexes.sampleData].fields.ventilation}
 		/>
 
 		<Radio
@@ -357,16 +271,14 @@
 			name="enviromentSolarIncidence"
 			label="Ambiente"
 			bind:result
-			bind:selected={form.enviromentSolarIncidence}
-			{validate}
+			bind:selected={form[HeatFormIndexes.sampleData].fields.enviromentSolarIncidence}
 		/>
 
 		<Input
 			placeholder={'Fonte de Calor'}
-			bind:value={form.heatSource}
+			bind:value={form[HeatFormIndexes.sampleData].fields.heatSource}
 			bind:result
 			name="heatSource"
-			{validate}
 		/>
 
 		<Radio
@@ -374,8 +286,7 @@
 			name="rest"
 			label="Descanso"
 			bind:result
-			bind:selected={form.rest}
-			{validate}
+			bind:selected={form[HeatFormIndexes.sampleData].fields.rest}
 		/>
 
 		<Radio
@@ -383,52 +294,51 @@
 			name="activities"
 			label="Atividade"
 			bind:result
-			bind:selected={form.activities}
-			{validate}
+			bind:selected={form[HeatFormIndexes.sampleData].fields.activities}
 		/>
 
 		<Input
 			placeholder={'Temperatura'}
-			bind:value={form.temperature}
+			bind:value={form[HeatFormIndexes.sampleData].fields.temperature}
 			bind:result
 			name="temperature"
-			{validate}
 		/>
 
 		<Input
 			placeholder={'Umidade'}
-			bind:value={form.humidity}
+			bind:value={form[HeatFormIndexes.sampleData].fields.humidity}
 			bind:result
 			name="humidity"
-			{validate}
 		/>
 
-		<Input placeholder={'Vento'} bind:value={form.wind} bind:result name="wind" {validate} />
+		<Input
+			placeholder={'Vento'}
+			bind:value={form[HeatFormIndexes.sampleData].fields.wind}
+			bind:result
+			name="wind"
+		/>
 
 		<Input
 			placeholder={'Hora Inicial'}
-			bind:value={form.startingTime}
+			bind:value={form[HeatFormIndexes.sampleData].fields.startingTime}
 			bind:result
 			name="startingTime"
-			{validate}
 			mask="00:00:00"
 		/>
 
 		<Input
 			placeholder={'Hora Final'}
-			bind:value={form.endingTime}
+			bind:value={form[HeatFormIndexes.sampleData].fields.endingTime}
 			bind:result
 			name="endingTime"
-			{validate}
 			mask="00:00:00"
 		/>
 
 		<Input
 			placeholder={'Tempo'}
-			bind:value={form.totalTime}
+			bind:value={form[HeatFormIndexes.sampleData].fields.totalTime}
 			bind:result
 			name="totalTime"
-			{validate}
 			disabled
 		/>
 
