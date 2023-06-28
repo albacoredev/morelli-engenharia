@@ -84,7 +84,6 @@
 				bind:value={form.email}
 				bind:result
 				autocomplete="username"
-				{validate}
 			/>
 			<Input
 				placeholder={'Senha'}
@@ -93,7 +92,6 @@
 				bind:result
 				type="password"
 				autocomplete="current-password"
-				{validate}
 			/>
 		</form>
 		<button class="btn btn-primary" on:click={signin}>entrar</button>

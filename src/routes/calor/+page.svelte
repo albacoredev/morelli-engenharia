@@ -1,15 +1,17 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
 	import Input from '$lib/components/Input.svelte';
 	import Radio from '$lib/components/Radio.svelte';
 	import type IHeatForm from '$lib/interfaces/forms/heat';
+	import { HeatFormIndexes } from '$lib/interfaces/forms/heat';
 	import { userStore } from '$lib/store';
 	import getTotalTime from '$lib/utils/getTotalTime';
 	import suite from '$lib/vestSuites/heat';
 	import type { User } from 'firebase/auth';
-	import { Timestamp } from 'firebase/firestore';
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { Timestamp } from 'firebase/firestore';
+	import { generatePdf } from '$lib/utils/generatePdf';
 
 	let currentUser: User | null = null;
 
@@ -21,67 +23,85 @@
 		});
 	});
 
-	let form: IHeatForm = {
-		company: '',
-		date: '',
-		sampleNumber: '',
-		valuation: '',
-		methodology: '',
-		name: '',
-		function: '',
-		sector: '',
-		ghe: '',
-		epi: '',
-		epc: '',
-		brand: '',
-		model: '',
-		serialNumber: '',
-		climaticConditions: '',
-		environment: '',
-		ventilation: '',
-		enviromentSolarIncidence: '',
-		heatSource: '',
-		rest: '',
-		activities: '',
-		temperature: '',
-		humidity: '',
-		wind: '',
-		startingTime: '',
-		endingTime: '',
-		totalTime: ''
-	};
+	let form: IHeatForm = [
+		{
+			name: 'header',
+			fields: {
+				company: '',
+				date: '',
+				sampleNumber: '',
+				valuation: '',
+				methodology: ''
+			}
+		},
+		{
+			name: 'employeeData',
+			fields: {
+				name: '',
+				function: '',
+				sector: '',
+				ghe: '',
+				epi: '',
+				epc: ''
+			}
+		},
+		{
+			name: 'equipmentData',
+			fields: {
+				brand: '',
+				model: '',
+				serialNumber: ''
+			}
+		},
+		{
+			name: 'sampleData',
+			fields: {
+				climaticConditions: '',
+				environment: '',
+				ventilation: '',
+				enviromentSolarIncidence: '',
+				heatSource: '',
+				rest: '',
+				activities: '',
+				temperature: '',
+				humidity: '',
+				wind: '',
+				startingTime: '',
+				endingTime: '',
+				totalTime: ''
+			}
+		}
+	];
 
 	let result = suite.get();
-
-	const validate = (name?: string) => {
-		result = suite(form, name ?? undefined);
-	};
 
 	const handleSubmit = async () => {
 		result = suite(form);
 
-		if (result.hasErrors()) return;
+		// if (result.hasErrors()) return;
 
 		if (browser) {
-			if (!currentUser) return;
-
-			const { addValuation } = await import('$lib/firebase/valuations');
-
-			await addValuation({
-				meta: {
-					createdAt: Timestamp.fromDate(new Date()),
-					updatedAt: Timestamp.fromDate(new Date()),
-					createdBy: currentUser.uid,
-					type: 'heat'
-				},
-				data: form
-			});
-
-			goto('/avaliacoes');
+			// if (!currentUser) return;
+			// const { addValuation } = await import('$lib/firebase/valuations');
+			// await addValuation({
+			// 	meta: {
+			// 		createdAt: Timestamp.fromDate(new Date()),
+			// 		updatedAt: Timestamp.fromDate(new Date()),
+			// 		createdBy: currentUser.uid,
+			// 		type: 'heat'
+			// 	},
+			// 	data: form
+			// });
+			// // Generate PDF
+			// goto('/avaliacoes');
+			// generatePdf(form, currentUser?.displayName ?? '', 'heat');
 		}
 	};
 
-	$: form.totalTime = getTotalTime(form.startingTime, form.endingTime);
+	$: form[HeatFormIndexes.sampleData].fields.totalTime = getTotalTime(
+		form[HeatFormIndexes.sampleData].fields.startingTime,
+		form[HeatFormIndexes.sampleData].fields.endingTime
+	);
 </script>
 
 <div class="flex items-center flex-col">
@@ -118,71 +138,78 @@
 	<div class="w-2/3 p-8">
 		<Input
 			placeholder={'Empresa'}
-			bind:value={form.company}
+			bind:value={form[HeatFormIndexes.header].fields.company}
 			bind:result
 			name="company"
-			{validate}
 		/>
 		<Input
 			placeholder={'Data'}
-			bind:value={form.date}
+			bind:value={form[HeatFormIndexes.header].fields.date}
 			bind:result
 			name="date"
-			{validate}
 			mask="00/00/0000"
 		/>
 		<Input
-			placeholder={'Número da Amostragem'}
-			bind:value={form.sampleNumber}
-			bind:result
 			name="sampleNumber"
-			{validate}
+			placeholder={'Número da Amostragem'}
+			bind:value={form[HeatFormIndexes.header].fields.sampleNumber}
+			bind:result
 		/>
 		<Radio
 			options={['Individual', 'Ambiental']}
 			name="valuation"
 			label="Avaliação"
 			bind:result
-			bind:selected={form.valuation}
-			{validate}
+			bind:selected={form[HeatFormIndexes.header].fields.valuation}
 		/>
 		<Radio
 			options={['NR-15', 'NHO-06']}
 			name="methodology"
 			label="Metodologia"
 			bind:result
-			bind:selected={form.methodology}
-			{validate}
+			bind:selected={form[HeatFormIndexes.header].fields.methodology}
 		/>
 
 		<div class="divider py-4">
 			<span class="text-lg text-secondary font-bold">Dados do Colaborador</span>
 		</div>
 
-		<Input placeholder={'Nome'} bind:value={form.name} bind:result name="name" {validate} />
+		<Input
+			placeholder={'Nome'}
+			bind:value={form[HeatFormIndexes.employeeData].fields.name}
+			bind:result
+			name="name"
+		/>
 		<Input
 			placeholder={'Função'}
-			bind:value={form.function}
+			bind:value={form[HeatFormIndexes.employeeData].fields.function}
 			bind:result
 			name="function"
-			{validate}
 		/>
-		<Input placeholder={'Setor'} bind:value={form.sector} bind:result name="sector" {validate} />
-		<Input placeholder={'GHE'} bind:value={form.ghe} bind:result name="ghe" {validate} />
+		<Input
+			placeholder={'Setor'}
+			bind:value={form[HeatFormIndexes.employeeData].fields.sector}
+			bind:result
+			name="sector"
+		/>
+		<Input
+			placeholder={'GHE'}
+			bind:value={form[HeatFormIndexes.employeeData].fields.ghe}
+			bind:result
+			name="ghe"
+		/>
 		<Input
 			placeholder={'EPI'}
-			bind:value={form.epi}
+			bind:value={form[HeatFormIndexes.employeeData].fields.epi}
 			bind:result
 			name="epi"
-			{validate}
 			type="textArea"
 		/>
 		<Input
 			placeholder={'EPC'}
-			bind:value={form.epc}
+			bind:value={form[HeatFormIndexes.employeeData].fields.epc}
 			bind:result
 			name="epc"
-			{validate}
 			type="textArea"
 		/>
 
@@ -192,14 +219,23 @@
 			>
 		</div>
 
-		<Input placeholder={'Marca'} bind:value={form.brand} bind:result name="brand" {validate} />
-		<Input placeholder={'Modelo'} bind:value={form.model} bind:result name="model" {validate} />
+		<Input
+			placeholder={'Marca'}
+			bind:value={form[HeatFormIndexes.equipmentData].fields.brand}
+			bind:result
+			name="brand"
+		/>
+		<Input
+			placeholder={'Modelo'}
+			bind:value={form[HeatFormIndexes.equipmentData].fields.model}
+			bind:result
+			name="model"
+		/>
 		<Input
 			placeholder={'Número de Série'}
-			bind:value={form.serialNumber}
+			bind:value={form[HeatFormIndexes.equipmentData].fields.serialNumber}
 			bind:result
 			name="serialNumber"
-			{validate}
 		/>
 
 		<div class="divider py-4">
@@ -211,8 +247,7 @@
 			name="climaticConditions"
 			label="Condições Climáticas"
 			bind:result
-			bind:selected={form.climaticConditions}
-			{validate}
+			bind:selected={form[HeatFormIndexes.sampleData].fields.climaticConditions}
 		/>
 
 		<Radio
@@ -220,8 +255,7 @@
 			name="environment"
 			label="Ambiente"
 			bind:result
-			bind:selected={form.environment}
-			{validate}
+			bind:selected={form[HeatFormIndexes.sampleData].fields.environment}
 		/>
 
 		<Radio
@@ -229,8 +263,7 @@
 			name="ventilation"
 			label="Ventilação"
 			bind:result
-			bind:selected={form.ventilation}
-			{validate}
+			bind:selected={form[HeatFormIndexes.sampleData].fields.ventilation}
 		/>
 
 		<Radio
@@ -238,16 +271,14 @@
 			name="enviromentSolarIncidence"
 			label="Ambiente"
 			bind:result
-			bind:selected={form.enviromentSolarIncidence}
-			{validate}
+			bind:selected={form[HeatFormIndexes.sampleData].fields.enviromentSolarIncidence}
 		/>
 
 		<Input
 			placeholder={'Fonte de Calor'}
-			bind:value={form.heatSource}
+			bind:value={form[HeatFormIndexes.sampleData].fields.heatSource}
 			bind:result
 			name="heatSource"
-			{validate}
 		/>
 
 		<Radio
@@ -255,8 +286,7 @@
 			name="rest"
 			label="Descanso"
 			bind:result
-			bind:selected={form.rest}
-			{validate}
+			bind:selected={form[HeatFormIndexes.sampleData].fields.rest}
 		/>
 
 		<Radio
@@ -264,52 +294,51 @@
 			name="activities"
 			label="Atividade"
 			bind:result
-			bind:selected={form.activities}
-			{validate}
+			bind:selected={form[HeatFormIndexes.sampleData].fields.activities}
 		/>
 
 		<Input
 			placeholder={'Temperatura'}
-			bind:value={form.temperature}
+			bind:value={form[HeatFormIndexes.sampleData].fields.temperature}
 			bind:result
 			name="temperature"
-			{validate}
 		/>
 
 		<Input
 			placeholder={'Umidade'}
-			bind:value={form.humidity}
+			bind:value={form[HeatFormIndexes.sampleData].fields.humidity}
 			bind:result
 			name="humidity"
-			{validate}
 		/>
 
-		<Input placeholder={'Vento'} bind:value={form.wind} bind:result name="wind" {validate} />
+		<Input
+			placeholder={'Vento'}
+			bind:value={form[HeatFormIndexes.sampleData].fields.wind}
+			bind:result
+			name="wind"
+		/>
 
 		<Input
 			placeholder={'Hora Inicial'}
-			bind:value={form.startingTime}
+			bind:value={form[HeatFormIndexes.sampleData].fields.startingTime}
 			bind:result
 			name="startingTime"
-			{validate}
 			mask="00:00:00"
 		/>
 
 		<Input
 			placeholder={'Hora Final'}
-			bind:value={form.endingTime}
+			bind:value={form[HeatFormIndexes.sampleData].fields.endingTime}
 			bind:result
 			name="endingTime"
-			{validate}
 			mask="00:00:00"
 		/>
 
 		<Input
 			placeholder={'Tempo'}
-			bind:value={form.totalTime}
+			bind:value={form[HeatFormIndexes.sampleData].fields.totalTime}
 			bind:result
 			name="totalTime"
-			{validate}
 			disabled
 		/>
 

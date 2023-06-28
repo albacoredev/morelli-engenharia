@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { readValuations } from '$lib/firebase/valuations';
-	import type IHeatValuationDoc from '$lib/interfaces/firebase/valuation';
+	import { HeatFormIndexes } from '$lib/interfaces/forms/heat';
 	import { userStore } from '$lib/store';
 	import type { User } from 'firebase/auth';
 	import { onMount } from 'svelte';
@@ -33,7 +33,10 @@
 		valuations = res.map((doc) => {
 			return {
 				type: ValuationType[doc.meta.type],
-				company: doc.data.company === '' ? 'Não informado' : doc.data.company,
+				company:
+					doc.data[HeatFormIndexes.header].fields.company === ''
+						? 'Não informado'
+						: doc.data[HeatFormIndexes.header].fields.company,
 				createdAt: new Date(doc.meta.createdAt.seconds * 1000).toLocaleDateString('pt-BR'),
 				updatedAt: new Date(doc.meta.updatedAt.seconds * 1000).toLocaleDateString('pt-BR')
 			};
