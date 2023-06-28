@@ -98,7 +98,15 @@
 		}
 	};
 
-	$: form[HeatFormIndexes.sampleData].fields.totalTime = getTotalTime(
+	const calculateTotalTime = (start: string, end: string) => {
+		try {
+			return getTotalTime(start, end);
+		} catch (e) {
+			return '00:00:00';
+		}
+	};
+
+	$: form[HeatFormIndexes.sampleData].fields.totalTime = calculateTotalTime(
 		form[HeatFormIndexes.sampleData].fields.startingTime,
 		form[HeatFormIndexes.sampleData].fields.endingTime
 	);
