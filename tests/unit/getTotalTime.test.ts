@@ -1,31 +1,42 @@
 import getTotalTime from '$lib/utils/getTotalTime';
 import { describe, expect, it } from 'vitest';
 
-describe('Validates and calculates total time', () => {
-	it('calculates total time', () => {
-		const startingTime = '14:00:00';
-		const endingTime = '15:00:00';
+describe('Validates starting and ending time', () => {
+	it('trhows if a invalid time format is given', () => {
+		let startingTime = '10:00:0';
+		let endingTime = '11:00:00';
 
-		const totalTime = getTotalTime(startingTime, endingTime);
+		expect(() => getTotalTime(startingTime, endingTime)).toThrowError(/^Invalid time format$/);
 
-		expect(totalTime).toBe('01:00:00');
+		startingTime = '09:00:00';
+		endingTime = '10:00:0';
+
+		expect(() => getTotalTime(startingTime, endingTime)).toThrowError(/^Invalid time format$/);
+
+		startingTime = '24:60:60';
+		endingTime = '10:00:00';
+
+		expect(() => getTotalTime(startingTime, endingTime)).toThrowError(/^Invalid time format$/);
+
+		startingTime = '10:00:00';
+		endingTime = '24:60:60';
+
+		expect(() => getTotalTime(startingTime, endingTime)).toThrowError(/^Invalid time format$/);
 	});
 
-	it('does not calculate an invalid time', () => {
-		const startingTime = '99:';
-		const endingTime = '14:00';
+	it('trhows if the starting time is greater than the ending time', () => {
+		let startingTime = '23:59:59';
+		let endingTime = '11:00:00';
 
-		const totalTime = getTotalTime(startingTime, endingTime);
+		expect(() => getTotalTime(startingTime, endingTime)).toThrowError(
+			/^Starting time cannot be greater than ending time$/
+		);
 
-		expect(totalTime).toBe('00:00:00');
-	});
+		startingTime = '01:00:00';
+		endingTime = '00:00:00';
 
-	it('does not calculate an starting time higher than the ending time', () => {
-		const startingTime = '15:00:00';
-		const endingTime = '14:00:00';
-
-		const totalTime = getTotalTime(startingTime, endingTime);
-
-		expect(totalTime).toBe('00:00:00');
+		expect(() => getTotalTime(startingTime, endingTime)).toThrowError(
+			/^Starting time cannot be greater than ending time$/
+		);
 	});
 });
