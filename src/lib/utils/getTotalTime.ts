@@ -5,8 +5,15 @@ export default function getTotalTime(start: string, end: string) {
 
 	if (!pattern.test(start) || !pattern.test(end)) throw new Error('Invalid time format');
 
-	const startingTime = hmsToSeconds(start);
-	const endingTime = hmsToSeconds(end);
+	let startingTime = 0;
+	let endingTime = 0;
+
+	try {
+		startingTime = hmsToSeconds(start);
+		endingTime = hmsToSeconds(end);
+	} catch (e) {
+		throw new Error('Invalid time format');
+	}
 
 	if (startingTime > endingTime)
 		throw new Error('Starting time cannot be greater than ending time');

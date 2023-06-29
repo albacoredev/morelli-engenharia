@@ -1,6 +1,10 @@
-const hmsToSeconds = (s: string) => {
-	const b = s.split(':');
-	return +b[0] * 3600 + +b[1] * 60 + (+b[2] || 0);
+const hmsToSeconds = (time: string) => {
+	const pattern = /^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/;
+
+	if (!pattern.test(time)) throw new Error('Invalid time format');
+
+	const [hours, minutes, seconds] = time.split(':');
+	return +hours * 3600 + +minutes * 60 + +seconds;
 };
 
 export default hmsToSeconds;
