@@ -112,7 +112,6 @@ declare module '$env/static/private' {
 	export const NODE: string;
 	export const NODE_ENV: string;
 	export const NODE_EXE: string;
-	export const NODE_OPTIONS: string;
 	export const NPM_CLI_JS: string;
 	export const npm_command: string;
 	export const npm_config_cache: string;
@@ -189,7 +188,7 @@ declare module '$env/static/private' {
 	export const VSCODE_GIT_ASKPASS_MAIN: string;
 	export const VSCODE_GIT_ASKPASS_NODE: string;
 	export const VSCODE_GIT_IPC_HANDLE: string;
-	export const VSCODE_INSPECTOR_OPTIONS: string;
+	export const WebStorm: string;
 	export const windir: string;
 	export const __COMPAT_LAYER: string;
 }
@@ -307,7 +306,6 @@ declare module '$env/dynamic/private' {
 		NODE: string;
 		NODE_ENV: string;
 		NODE_EXE: string;
-		NODE_OPTIONS: string;
 		NPM_CLI_JS: string;
 		npm_command: string;
 		npm_config_cache: string;
@@ -384,7 +382,7 @@ declare module '$env/dynamic/private' {
 		VSCODE_GIT_ASKPASS_MAIN: string;
 		VSCODE_GIT_ASKPASS_NODE: string;
 		VSCODE_GIT_IPC_HANDLE: string;
-		VSCODE_INSPECTOR_OPTIONS: string;
+		WebStorm: string;
 		windir: string;
 		__COMPAT_LAYER: string;
 		[key: `PUBLIC_${string}`]: undefined;
