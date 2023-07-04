@@ -84,6 +84,7 @@
 				bind:value={form.email}
 				bind:result
 				autocomplete="username"
+				dataCy="email-input"
 			/>
 			<Input
 				placeholder={'Senha'}
@@ -92,8 +93,9 @@
 				bind:result
 				type="password"
 				autocomplete="current-password"
+				dataCy="password-input"
 			/>
 		</form>
-		<button class="btn btn-primary" on:click={signin}>entrar</button>
+		<button data-cy="signing-button" class="btn btn-primary" on:click={signin}>entrar</button>
 	</div>
 </div>
