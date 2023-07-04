@@ -8,6 +8,7 @@ import {
 	ValuationTypesDisplayName,
 	type ValuationTypes
 } from '$lib/interfaces/forms/common';
+import { browser } from '$app/environment';
 
 const logoWidth = 58;
 const logoHeight = 16;
@@ -108,9 +109,16 @@ export const generatePdf = (
 		});
 	});
 
-	doc.save(
-		`${ValuationTypesDisplayName[type]}_${currentUserDisplayName}_${
-			form[FormIndexes[type as keyof typeof FormIndexes].header].fields.company
-		}`
-	);
+	// doc.save(
+	// 	`${ValuationTypesDisplayName[type]}_${currentUserDisplayName}_${
+	// 		form[FormIndexes[type as keyof typeof FormIndexes].header].fields.company
+	// 	}`
+	// );
+
+	const blob = doc.output('blob');
+
+	// Create a URL for the Blob
+	const url = URL.createObjectURL(blob);
+
+	return url;
 };
