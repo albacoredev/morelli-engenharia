@@ -18,6 +18,10 @@
 </script>
 
 <div class="form-control w-full py-2">
+	<label class="label" for={name}>
+		<span class="label-text">{placeholder}</span>
+	</label>
+
 	{#if type === 'textArea'}
 		<textarea
 			{placeholder}
@@ -60,7 +64,7 @@
 	{/if}
 
 	{#if result && result.getErrors()[name]}
-		<label class="label" for={placeholder}>
+		<label class="label" for={name}>
 			<span class="label-text-alt text-error">{result.getErrors()[name][0]}</span>
 		</label>
 	{/if}
