@@ -5,6 +5,7 @@
 	import { userStore, valuationsStore } from '$lib/store';
 	import type { User } from 'firebase/auth';
 	import { readValuations } from '$lib/firebase/valuations';
+	import Loading from '$lib/components/Loading.svelte';
 
 	let user: User | null = null;
 
@@ -14,6 +15,9 @@
 		const { auth } = await import('$lib/firebase/firebase');
 
 		const unsubscribe = auth.onAuthStateChanged(async (user) => {
+			userStore.update((curr) => ({ ...curr, loading: true }));
+			valuationsStore.update((curr) => ({ ...curr, loading: true }));
+
 			const currentPath = window.location.pathname;
 
 			if (!user && !nonAuthRoutes.includes(currentPath)) {
@@ -42,5 +46,5 @@
 {#if user}
 	<slot />
 {:else}
-	loading
+	<Loading />
 {/if}
