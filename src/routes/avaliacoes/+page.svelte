@@ -7,7 +7,7 @@
 	import { onMount } from 'svelte';
 
 	interface ITableRow {
-		type: string;
+		type: keyof typeof ValuationTypesDisplayName;
 		company: string;
 		createdAt: string;
 		updatedAt: string;
@@ -30,6 +30,7 @@
 	userStore.subscribe((store) => (currentUserStore = store));
 
 	let valuations = currentValuationsStore.valuations;
+	let userDisplayName = currentUserStore.user?.displayName ?? '';
 	let rows: ITableRow[] = [];
 
 	onMount(() => {
@@ -100,7 +101,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each rows as row, i}
+			{#each rows as row}
 				<tr>
 					<td>{ValuationTypesDisplayName[row.type]}</td>
 					<!--TODO-->
@@ -111,7 +112,7 @@
 						><button
 							class="btn btn-primary btn-sm"
 							on:click={() => {
-								downloadPDF(row.formData, currentUserStore.user?.displayName ?? '', row.type);
+								downloadPDF(row.formData, userDisplayName, row.type);
 							}}>PDF</button
 						></td
 					>
