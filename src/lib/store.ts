@@ -1,18 +1,30 @@
-import type { Auth } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut, type User } from 'firebase/auth';
 import { writable } from 'svelte/store';
+import { auth } from './firebase/firebase';
+import type IHeatValuationDoc from './interfaces/firebase/valuation';
 
-export const userStore = (auth: Auth) => {
-	let unsubscribe: () => void;
+export interface UserStore {
+	user: User | null;
+	loading: boolean;
+}
 
-	const { subscribe } = writable(auth.currentUser, (set) => {
-		unsubscribe = auth.onAuthStateChanged((user) => {
-			set(user);
-		});
+export interface ValuationsStore {
+	valuations: IHeatValuationDoc[];
+	loading: boolean;
+}
 
-		return () => unsubscribe();
-	});
+export const userStore = writable<UserStore>({
+	user: null,
+	loading: true
+});
 
-	return {
-		subscribe
-	};
+export const valuationsStore = writable<ValuationsStore>({
+	valuations: [],
+	loading: true
+});
+
+export const authHandlers = {
+	login: async (email: string, password: string) =>
+		await signInWithEmailAndPassword(auth, email, password),
+	logout: async () => await signOut(auth)
 };

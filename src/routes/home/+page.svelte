@@ -1,19 +1,21 @@
 <script lang="ts">
 	import Logo from '$lib/components/Logo.svelte';
-	import { userStore } from '$lib/store';
-	import type { User } from 'firebase/auth';
-	import { onMount } from 'svelte';
+	import { userStore, valuationsStore, type UserStore, type ValuationsStore } from '$lib/store';
 
-	let currentUser: User | null = null;
+	let currentUserStore: UserStore = {
+		user: null,
+		loading: false
+	};
 
-	onMount(async () => {
-		const { auth } = await import('$lib/firebase/firebase');
+	let currentValuationsStore: ValuationsStore = {
+		valuations: [],
+		loading: false
+	};
 
-		userStore(auth).subscribe((user) => {
-			currentUser = user;
-		});
-	});
+	userStore.subscribe((store) => (currentUserStore = store));
+	valuationsStore.subscribe((store) => (currentValuationsStore = store));
 
+	let userDisplayName = currentUserStore.user?.displayName ?? '';
 	let greeting = '';
 
 	const time = new Date().toLocaleTimeString('pt-BR', {
@@ -33,9 +35,7 @@
 
 <div class="flex w-1/3 flex-col items-center my-0 mx-auto gap-8 h-full justify-center">
 	<Logo />
-	<span class="text-base-content font-bold normal-case text-xl"
-		>{greeting}, {currentUser?.displayName}</span
-	>
+	<span class="text-base-content font-bold normal-case text-xl">{greeting}, {userDisplayName}</span>
 
 	<div class="divider py-4">
 		<span class="text-lg text-secondary font-bold">Avaliações Quantitativas</span>
@@ -47,7 +47,7 @@
 		<span class="text-lg text-secondary font-bold">Criar Nova Avaliação Quantitativa</span>
 	</div>
 	<a class="w-full" href="./calor"><button class="btn btn-primary w-full">calor</button></a>
-	<button class="btn btn-primary w-full">ruído</button>
-	<button class="btn btn-primary w-full">vibração</button>
-	<button class="btn btn-primary w-full">agentes químicos</button>
+	<button class="btn btn-primary w-full btn-disabled">ruído</button>
+	<button class="btn btn-primary w-full btn-disabled">vibração</button>
+	<button class="btn btn-primary w-full btn-disabled">agentes químicos</button>
 </div>

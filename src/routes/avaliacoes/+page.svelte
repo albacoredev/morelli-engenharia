@@ -1,47 +1,60 @@
 <script lang="ts">
-	import { readValuations } from '$lib/firebase/valuations';
+	import { ValuationTypesDisplayName, type ValuationTypes } from '$lib/interfaces/forms/common';
+	import type IHeatForm from '$lib/interfaces/forms/heat';
 	import { HeatFormIndexes } from '$lib/interfaces/forms/heat';
-	import { userStore } from '$lib/store';
-	import type { User } from 'firebase/auth';
+	import { userStore, valuationsStore, type UserStore, type ValuationsStore } from '$lib/store';
+	import { generatePdf } from '$lib/utils/generatePdf';
 	import { onMount } from 'svelte';
 
-	enum ValuationType {
-		heat = 'Calor'
-	}
-
 	interface ITableRow {
-		type: ValuationType;
+		type: keyof typeof ValuationTypesDisplayName;
 		company: string;
 		createdAt: string;
 		updatedAt: string;
+		formData: IHeatForm;
 	}
 
-	let currentUser: User | null = null;
-	let valuations: ITableRow[] = [];
+	let currentUserStore: UserStore = {
+		user: null,
+		loading: false
+	};
 
-	onMount(async () => {
-		const { auth } = await import('$lib/firebase/firebase');
+	let currentValuationsStore: ValuationsStore = {
+		valuations: [],
+		loading: false
+	};
 
-		userStore(auth).subscribe((user) => {
-			currentUser = user;
-		});
+	userStore.subscribe((store) => (currentUserStore = store));
+	valuationsStore.subscribe((store) => (currentValuationsStore = store));
 
-		if (!currentUser) return;
+	userStore.subscribe((store) => (currentUserStore = store));
 
-		const res = await readValuations(currentUser.uid);
+	let valuations = currentValuationsStore.valuations;
+	let userDisplayName = currentUserStore.user?.displayName ?? '';
+	let rows: ITableRow[] = [];
 
-		valuations = res.map((doc) => {
+	onMount(() => {
+		if (!currentUserStore.user) return;
+
+		rows = valuations.map((valuation) => {
 			return {
-				type: ValuationType[doc.meta.type],
+				type: valuation.meta.type,
 				company:
-					doc.data[HeatFormIndexes.header].fields.company === ''
+					valuation.data[HeatFormIndexes.header].fields.company === ''
 						? 'Não informado'
-						: doc.data[HeatFormIndexes.header].fields.company,
-				createdAt: new Date(doc.meta.createdAt.seconds * 1000).toLocaleDateString('pt-BR'),
-				updatedAt: new Date(doc.meta.updatedAt.seconds * 1000).toLocaleDateString('pt-BR')
+						: valuation.data[HeatFormIndexes.header].fields.company,
+				createdAt: new Date(valuation.meta.createdAt.seconds * 1000).toLocaleDateString('pt-BR'),
+				updatedAt: new Date(valuation.meta.updatedAt.seconds * 1000).toLocaleDateString('pt-BR'),
+				formData: valuation.data
 			};
 		});
 	});
+
+	const downloadPDF = (form: IHeatForm, author: string, type: string) => {
+		const url = generatePdf(form, author, type as ValuationTypes);
+
+		window.open(url, '_blank');
+	};
 </script>
 
 <div class="navbar bg-base-100">
@@ -70,7 +83,9 @@
 		</a>
 	</div>
 	<div class="flex-1">
-		<span class="normal-case text-xl px-4">Avaliações de {currentUser?.displayName}</span>
+		<span class="normal-case text-xl px-4"
+			>Avaliações de {currentUserStore.user?.displayName ?? ''}</span
+		>
 	</div>
 </div>
 
@@ -82,15 +97,25 @@
 				<th>Empresa</th>
 				<th>Criado</th>
 				<th>Atualizado</th>
+				<th />
 			</tr>
 		</thead>
 		<tbody>
-			{#each valuations as valuation}
+			{#each rows as row}
 				<tr>
-					<td>{valuation.type}</td>
-					<td>{valuation.company}</td>
-					<td>{valuation.createdAt}</td>
-					<td>{valuation.updatedAt}</td>
+					<td>{ValuationTypesDisplayName[row.type]}</td>
+					<!--TODO-->
+					<td>{row.company}</td>
+					<td>{row.createdAt}</td>
+					<td>{row.updatedAt}</td>
+					<td
+						><button
+							class="btn btn-primary btn-sm"
+							on:click={() => {
+								downloadPDF(row.formData, userDisplayName, row.type);
+							}}>PDF</button
+						></td
+					>
 				</tr>
 			{/each}
 		</tbody>

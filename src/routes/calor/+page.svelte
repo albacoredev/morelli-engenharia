@@ -4,24 +4,24 @@
 	import Radio from '$lib/components/Radio.svelte';
 	import type IHeatForm from '$lib/interfaces/forms/heat';
 	import { HeatFormIndexes } from '$lib/interfaces/forms/heat';
-	import { userStore } from '$lib/store';
+	import { userStore, valuationsStore, type UserStore, type ValuationsStore } from '$lib/store';
 	import getTotalTime from '$lib/utils/getTotalTime';
 	import suite from '$lib/vestSuites/heat';
-	import type { User } from 'firebase/auth';
-	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { Timestamp } from 'firebase/firestore';
-	import { generatePdf } from '$lib/utils/generatePdf';
 
-	let currentUser: User | null = null;
+	let currentUserStore: UserStore = {
+		user: null,
+		loading: false
+	};
 
-	onMount(async () => {
-		const { auth } = await import('$lib/firebase/firebase');
+	let currentValuationsStore: ValuationsStore = {
+		valuations: [],
+		loading: false
+	};
 
-		userStore(auth).subscribe((user) => {
-			currentUser = user;
-		});
-	});
+	userStore.subscribe((store) => (currentUserStore = store));
+	valuationsStore.subscribe((store) => (currentValuationsStore = store));
 
 	let form: IHeatForm = [
 		{
@@ -78,23 +78,24 @@
 	const handleSubmit = async () => {
 		result = suite(form);
 
-		// if (result.hasErrors()) return;
+		// if (result.hasErrors()) return; // TODO
 
 		if (browser) {
-			// if (!currentUser) return;
-			// const { addValuation } = await import('$lib/firebase/valuations');
-			// await addValuation({
-			// 	meta: {
-			// 		createdAt: Timestamp.fromDate(new Date()),
-			// 		updatedAt: Timestamp.fromDate(new Date()),
-			// 		createdBy: currentUser.uid,
-			// 		type: 'heat'
-			// 	},
-			// 	data: form
-			// });
-			// // Generate PDF
-			// goto('/avaliacoes');
-			// generatePdf(form, currentUser?.displayName ?? '', 'heat');
+			if (!currentUserStore.user) return;
+
+			const { addValuation } = await import('$lib/firebase/valuations');
+
+			await addValuation({
+				meta: {
+					createdAt: Timestamp.fromDate(new Date()),
+					updatedAt: Timestamp.fromDate(new Date()),
+					createdBy: currentUserStore.user.uid,
+					type: 'heat' // TODO
+				},
+				data: form
+			});
+
+			goto('../avaliacoes');
 		}
 	};
 
@@ -139,7 +140,7 @@
 			</a>
 		</div>
 		<div class="flex-1">
-			<span class="normal-case text-xl px-4">daisyUI</span>
+			<span class="normal-case text-xl px-4">Criar Avaliação Quantitativa de Calor</span>
 		</div>
 	</div>
 
