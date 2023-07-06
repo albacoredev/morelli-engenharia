@@ -34,7 +34,6 @@
 </script>
 
 <div class="flex w-1/3 flex-col items-center my-0 mx-auto gap-8 h-full justify-center">
-	<Logo />
 	<span class="text-base-content font-bold normal-case text-xl">{greeting}, {userDisplayName}</span>
 
 	<div class="divider py-4">
