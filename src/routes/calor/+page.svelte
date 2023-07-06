@@ -113,7 +113,7 @@
 	);
 </script>
 
-<div class="flex items-center flex-col">
+<div class="flex flex-col items-center my-0 mx-auto justify-center">
 	<div class="navbar bg-base-100">
 		<div class="flex-none">
 			<a href="./home">
@@ -144,7 +144,7 @@
 		</div>
 	</div>
 
-	<div class="w-2/3 p-8">
+	<div class="w-full md:w-2/3 lg:w-2/4 p-8">
 		<Input
 			placeholder={'Empresa'}
 			bind:value={form[HeatFormIndexes.header].fields.company}
