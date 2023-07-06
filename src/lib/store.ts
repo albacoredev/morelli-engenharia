@@ -15,12 +15,12 @@ export interface ValuationsStore {
 
 export const userStore = writable<UserStore>({
 	user: null,
-	loading: false
+	loading: true
 });
 
 export const valuationsStore = writable<ValuationsStore>({
 	valuations: [],
-	loading: false
+	loading: true
 });
 
 export const authHandlers = {
