@@ -33,7 +33,9 @@
 	}
 </script>
 
-<div class="flex w-1/3 flex-col items-center my-0 mx-auto gap-8 h-full justify-center">
+<div
+	class="flex flex-col items-center my-0 mx-auto justify-center gap-8 box-border py-16 w-3/4 md:w-2/4 lg:w-1/4"
+>
 	<span class="text-base-content font-bold normal-case text-xl">{greeting}, {userDisplayName}</span>
 
 	<div class="divider py-4">
