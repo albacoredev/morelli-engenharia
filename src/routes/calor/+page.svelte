@@ -4,7 +4,7 @@
 	import Radio from '$lib/components/Radio.svelte';
 	import type IHeatForm from '$lib/interfaces/forms/heat';
 	import { HeatFormIndexes } from '$lib/interfaces/forms/heat';
-	import { userStore, valuationsStore, type UserStore, type ValuationsStore } from '$lib/store';
+	import { userStore, type UserStore } from '$lib/store';
 	import getTotalTime from '$lib/utils/getTotalTime';
 	import suite from '$lib/vestSuites/heat';
 	import { goto } from '$app/navigation';
@@ -15,13 +15,7 @@
 		loading: false
 	};
 
-	let currentValuationsStore: ValuationsStore = {
-		valuations: [],
-		loading: false
-	};
-
 	userStore.subscribe((store) => (currentUserStore = store));
-	valuationsStore.subscribe((store) => (currentValuationsStore = store));
 
 	let form: IHeatForm = [
 		{
@@ -75,13 +69,15 @@
 
 	let result = suite.get();
 
+	let savingValuation = false;
+
 	const handleSubmit = async () => {
 		result = suite(form);
 
-		// if (result.hasErrors()) return; // TODO
+		if (result.hasErrors() || !currentUserStore.user) return;
 
 		if (browser) {
-			if (!currentUserStore.user) return;
+			savingValuation = true;
 
 			const { addValuation } = await import('$lib/firebase/valuations');
 
@@ -90,12 +86,12 @@
 					createdAt: Timestamp.fromDate(new Date()),
 					updatedAt: Timestamp.fromDate(new Date()),
 					createdBy: currentUserStore.user.uid,
-					type: 'heat' // TODO
+					type: 'heat'
 				},
 				data: form
 			});
 
-			goto('../avaliacoes');
+			await goto('../avaliacoes');
 		}
 	};
 
@@ -113,7 +109,7 @@
 	);
 </script>
 
-<div class="flex items-center flex-col">
+<div class="flex flex-col items-center my-0 mx-auto justify-center">
 	<div class="navbar bg-base-100">
 		<div class="flex-none">
 			<a href="./home">
@@ -144,7 +140,7 @@
 		</div>
 	</div>
 
-	<div class="w-2/3 p-8">
+	<div class="w-full md:w-2/3 lg:w-2/4 p-8">
 		<Input
 			placeholder={'Empresa'}
 			bind:value={form[HeatFormIndexes.header].fields.company}
@@ -352,7 +348,11 @@
 		/>
 
 		<div class="w-full flex justify-center py-8">
-			<button class="btn btn-primary w-full max-w-xs" on:click={handleSubmit}>Enviar</button>
+			{#if savingValuation}
+				<button class="btn btn-primary w-full max-w-xs btn-disabled">carregando</button>
+			{:else}
+				<button class="btn btn-primary w-full max-w-xs" on:click={handleSubmit}>Enviar</button>
+			{/if}
 		</div>
 	</div>
 </div>

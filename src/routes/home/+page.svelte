@@ -1,19 +1,12 @@
 <script lang="ts">
-	import Logo from '$lib/components/Logo.svelte';
-	import { userStore, valuationsStore, type UserStore, type ValuationsStore } from '$lib/store';
+	import { userStore, type UserStore } from '$lib/store';
 
 	let currentUserStore: UserStore = {
 		user: null,
 		loading: false
 	};
 
-	let currentValuationsStore: ValuationsStore = {
-		valuations: [],
-		loading: false
-	};
-
 	userStore.subscribe((store) => (currentUserStore = store));
-	valuationsStore.subscribe((store) => (currentValuationsStore = store));
 
 	let userDisplayName = currentUserStore.user?.displayName ?? '';
 	let greeting = '';
@@ -33,8 +26,9 @@
 	}
 </script>
 
-<div class="flex w-1/3 flex-col items-center my-0 mx-auto gap-8 h-full justify-center">
-	<Logo />
+<div
+	class="flex flex-col items-center my-0 mx-auto justify-center gap-8 box-border py-16 w-3/4 md:w-2/4 lg:w-1/4"
+>
 	<span class="text-base-content font-bold normal-case text-xl">{greeting}, {userDisplayName}</span>
 
 	<div class="divider py-4">

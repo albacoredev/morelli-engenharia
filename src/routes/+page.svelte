@@ -53,8 +53,12 @@
 	};
 </script>
 
-<div class="flex w-1/3 flex-col items-center my-0 mx-auto gap-8 h-full justify-center py-16">
-	<Logo />
+<div
+	class="flex flex-col items-center my-0 mx-auto h-full justify-center gap-8 py-16 w-3/4 md:w-2/4 lg:w-1/4"
+>
+	<div class="w-2/4">
+		<Logo />
+	</div>
 	<div class="flex flex-col gap-4 w-full">
 		<div
 			class="transition-opacity alert alert-error shadow-lg"

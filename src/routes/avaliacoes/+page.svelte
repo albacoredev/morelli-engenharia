@@ -1,8 +1,9 @@
 <script lang="ts">
+	import Loading from '$lib/components/Loading.svelte';
 	import { ValuationTypesDisplayName, type ValuationTypes } from '$lib/interfaces/forms/common';
 	import type IHeatForm from '$lib/interfaces/forms/heat';
 	import { HeatFormIndexes } from '$lib/interfaces/forms/heat';
-	import { userStore, valuationsStore, type UserStore, type ValuationsStore } from '$lib/store';
+	import { userStore, valuationsHandlers, type UserStore } from '$lib/store';
 	import { generatePdf } from '$lib/utils/generatePdf';
 	import { onMount } from 'svelte';
 
@@ -19,22 +20,16 @@
 		loading: false
 	};
 
-	let currentValuationsStore: ValuationsStore = {
-		valuations: [],
-		loading: false
-	};
-
-	userStore.subscribe((store) => (currentUserStore = store));
-	valuationsStore.subscribe((store) => (currentValuationsStore = store));
-
-	userStore.subscribe((store) => (currentUserStore = store));
-
-	let valuations = currentValuationsStore.valuations;
-	let userDisplayName = currentUserStore.user?.displayName ?? '';
 	let rows: ITableRow[] = [];
+	let valuationsLoading = true;
 
-	onMount(() => {
+	onMount(async () => {
+		userStore.subscribe((store) => (currentUserStore = store));
+
 		if (!currentUserStore.user) return;
+
+		const valuations = await valuationsHandlers.read(currentUserStore.user.uid);
+		valuationsLoading = false;
 
 		rows = valuations.map((valuation) => {
 			return {
@@ -101,23 +96,27 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each rows as row}
-				<tr>
-					<td>{ValuationTypesDisplayName[row.type]}</td>
-					<!--TODO-->
-					<td>{row.company}</td>
-					<td>{row.createdAt}</td>
-					<td>{row.updatedAt}</td>
-					<td
-						><button
-							class="btn btn-primary btn-sm"
-							on:click={() => {
-								downloadPDF(row.formData, userDisplayName, row.type);
-							}}>PDF</button
-						></td
-					>
-				</tr>
-			{/each}
+			{#if valuationsLoading}
+				<Loading />
+			{:else}
+				{#each rows as row}
+					<tr>
+						<td>{ValuationTypesDisplayName[row.type]}</td>
+						<!--TODO-->
+						<td>{row.company}</td>
+						<td>{row.createdAt}</td>
+						<td>{row.updatedAt}</td>
+						<td
+							><button
+								class="btn btn-primary btn-sm"
+								on:click={() => {
+									downloadPDF(row.formData, currentUserStore?.user?.displayName ?? '', row.type);
+								}}>PDF</button
+							></td
+						>
+					</tr>
+				{/each}
+			{/if}
 		</tbody>
 	</table>
 </div>
