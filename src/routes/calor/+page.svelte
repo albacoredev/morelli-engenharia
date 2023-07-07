@@ -4,7 +4,7 @@
 	import Radio from '$lib/components/Radio.svelte';
 	import type IHeatForm from '$lib/interfaces/forms/heat';
 	import { HeatFormIndexes } from '$lib/interfaces/forms/heat';
-	import { userStore, valuationsStore, type UserStore, type ValuationsStore } from '$lib/store';
+	import { userStore, type UserStore } from '$lib/store';
 	import getTotalTime from '$lib/utils/getTotalTime';
 	import suite from '$lib/vestSuites/heat';
 	import { goto } from '$app/navigation';
@@ -15,13 +15,7 @@
 		loading: false
 	};
 
-	let currentValuationsStore: ValuationsStore = {
-		valuations: [],
-		loading: false
-	};
-
 	userStore.subscribe((store) => (currentUserStore = store));
-	valuationsStore.subscribe((store) => (currentValuationsStore = store));
 
 	let form: IHeatForm = [
 		{

@@ -1,19 +1,12 @@
 <script lang="ts">
-	import Logo from '$lib/components/Logo.svelte';
-	import { userStore, valuationsStore, type UserStore, type ValuationsStore } from '$lib/store';
+	import { userStore, type UserStore } from '$lib/store';
 
 	let currentUserStore: UserStore = {
 		user: null,
 		loading: false
 	};
 
-	let currentValuationsStore: ValuationsStore = {
-		valuations: [],
-		loading: false
-	};
-
 	userStore.subscribe((store) => (currentUserStore = store));
-	valuationsStore.subscribe((store) => (currentValuationsStore = store));
 
 	let userDisplayName = currentUserStore.user?.displayName ?? '';
 	let greeting = '';
