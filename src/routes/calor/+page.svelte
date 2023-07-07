@@ -9,6 +9,7 @@
 	import suite from '$lib/vestSuites/heat';
 	import { goto } from '$app/navigation';
 	import { Timestamp } from 'firebase/firestore';
+	import { onDestroy, onMount } from 'svelte';
 
 	let currentUserStore: UserStore = {
 		user: null,
@@ -71,12 +72,27 @@
 
 	let savingValuation = false;
 
+	onDestroy(() => {
+		suite.reset();
+	});
+
 	const handleSubmit = async () => {
-		result = suite(form);
-
-		if (result.hasErrors() || !currentUserStore.user) return;
-
 		if (browser) {
+			result = suite(form);
+
+			if (result.hasErrors()) {
+				const firstErrorInputName = Object.keys(result.getErrors())[0];
+				const element = document.querySelector(`input[name="${firstErrorInputName}"]`);
+
+				if (!element) return;
+
+				element.scrollIntoView({ behavior: 'smooth' });
+
+				return;
+			}
+
+			if (!currentUserStore.user) return;
+
 			savingValuation = true;
 
 			const { addValuation } = await import('$lib/firebase/valuations');
