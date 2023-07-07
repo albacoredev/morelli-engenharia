@@ -36,6 +36,5 @@
 {#if loading}
 	<Loading />
 {:else}
-	<button on:click={authHandlers.logout}>Sair</button>
 	<slot />
 {/if}

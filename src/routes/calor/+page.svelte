@@ -69,13 +69,15 @@
 
 	let result = suite.get();
 
+	let savingValuation = false;
+
 	const handleSubmit = async () => {
 		result = suite(form);
 
-		// if (result.hasErrors()) return; // TODO
+		if (result.hasErrors() || !currentUserStore.user) return;
 
 		if (browser) {
-			if (!currentUserStore.user) return;
+			savingValuation = true;
 
 			const { addValuation } = await import('$lib/firebase/valuations');
 
@@ -84,12 +86,12 @@
 					createdAt: Timestamp.fromDate(new Date()),
 					updatedAt: Timestamp.fromDate(new Date()),
 					createdBy: currentUserStore.user.uid,
-					type: 'heat' // TODO
+					type: 'heat'
 				},
 				data: form
 			});
 
-			goto('../avaliacoes');
+			await goto('../avaliacoes');
 		}
 	};
 
@@ -346,7 +348,11 @@
 		/>
 
 		<div class="w-full flex justify-center py-8">
-			<button class="btn btn-primary w-full max-w-xs" on:click={handleSubmit}>Enviar</button>
+			{#if savingValuation}
+				<button class="btn btn-primary w-full max-w-xs btn-disabled">carregando</button>
+			{:else}
+				<button class="btn btn-primary w-full max-w-xs" on:click={handleSubmit}>Enviar</button>
+			{/if}
 		</div>
 	</div>
 </div>
