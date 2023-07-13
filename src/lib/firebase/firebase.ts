@@ -3,6 +3,7 @@ import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { connectFirestoreEmulator, getFirestore } from '@firebase/firestore';
 import { connectAuthEmulator, getAuth } from 'firebase/auth';
+import { browser } from '$app/environment';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -24,7 +25,9 @@ const db = getFirestore(app);
 const analytics = null; // getAnalytics(app);
 const auth = getAuth(app);
 
-connectAuthEmulator(auth, 'http://localhost:9099');
-connectFirestoreEmulator(db, 'localhost', 8080);
+if (browser && window.location.href.includes('localhost')) {
+	connectAuthEmulator(auth, 'http://localhost:9099');
+	connectFirestoreEmulator(db, 'localhost', 8080);
+}
 
 export { db, analytics, auth };
