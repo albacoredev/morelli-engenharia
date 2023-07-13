@@ -165,6 +165,7 @@
 		/>
 		<Input
 			placeholder={'Data'}
+			dataCyType="date"
 			bind:value={form[HeatFormIndexes.header].fields.date}
 			bind:result
 			name="date"
@@ -341,6 +342,7 @@
 
 		<Input
 			placeholder={'Hora Inicial'}
+			dataCyType="time"
 			bind:value={form[HeatFormIndexes.sampleData].fields.startingTime}
 			bind:result
 			name="startingTime"
@@ -349,6 +351,7 @@
 
 		<Input
 			placeholder={'Hora Final'}
+			dataCyType="time"
 			bind:value={form[HeatFormIndexes.sampleData].fields.endingTime}
 			bind:result
 			name="endingTime"
@@ -367,7 +370,11 @@
 			{#if savingValuation}
 				<button class="btn btn-primary w-full max-w-xs btn-disabled">carregando</button>
 			{:else}
-				<button class="btn btn-primary w-full max-w-xs" on:click={handleSubmit}>Enviar</button>
+				<button
+					class="btn btn-primary w-full max-w-xs"
+					data-cy="button-submit"
+					on:click={handleSubmit}>Enviar</button
+				>
 			{/if}
 		</div>
 	</div>

@@ -23,9 +23,13 @@
 	let rows: ITableRow[] = [];
 	let valuationsLoading = true;
 
-	onMount(async () => {
-		userStore.subscribe((store) => (currentUserStore = store));
+	userStore.subscribe((store) => {
+		currentUserStore = store;
+	});
 
+	let userDisplayName = currentUserStore?.user?.email?.split('@')[0] ?? '';
+
+	onMount(async () => {
 		if (!currentUserStore.user) return;
 
 		const valuations = await valuationsHandlers.read(currentUserStore.user.uid);
@@ -78,9 +82,7 @@
 		</a>
 	</div>
 	<div class="flex-1">
-		<span class="normal-case text-xl px-4"
-			>Avaliações de {currentUserStore.user?.displayName ?? ''}</span
-		>
+		<span class="normal-case text-xl px-4">Avaliações de {userDisplayName}</span>
 	</div>
 </div>
 
@@ -110,7 +112,7 @@
 							><button
 								class="btn btn-primary btn-sm"
 								on:click={() => {
-									downloadPDF(row.formData, currentUserStore?.user?.displayName ?? '', row.type);
+									downloadPDF(row.formData, userDisplayName, row.type);
 								}}>PDF</button
 							></td
 						>
