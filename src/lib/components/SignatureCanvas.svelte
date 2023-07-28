@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 
 	export let holder: SignatureOwner;
+	export let value = '';
 
 	let canvas: HTMLCanvasElement | null = null;
 
@@ -24,6 +25,10 @@
 	window.addEventListener('resize', resizeCanvas);
 
 	onMount(resizeCanvas);
+
+	$: signPad?.addEventListener('endStroke', () => {
+		value = signPad?.toDataURL('image/png').split(',')[1] ?? '';
+	});
 </script>
 
 <div class="w-full flex flex-col gap-2 py-4">

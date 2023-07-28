@@ -20,7 +20,16 @@
 
 	userStore.subscribe((store) => (currentUserStore = store));
 
+	const signatures = {
+		[SignatureOwner.Evaluated]: '',
+		[SignatureOwner.Evaluator]: ''
+	};
+
 	let form: IHeatForm = [
+		{
+			name: 'meta',
+			signatures
+		},
 		{
 			name: 'header',
 			fields: {
@@ -368,8 +377,8 @@
 			disabled
 		/>
 
-		<SignatureCanvas holder={SignatureOwner.Evaluated} />
-		<SignatureCanvas holder={SignatureOwner.Evaluator} />
+		<SignatureCanvas holder={SignatureOwner.Evaluated} bind:value={signatures.evalueted} />
+		<SignatureCanvas holder={SignatureOwner.Evaluator} bind:value={signatures.evaluator} />
 
 		<div class="w-full flex justify-center py-8">
 			{#if savingValuation}

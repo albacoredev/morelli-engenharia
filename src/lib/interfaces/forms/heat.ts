@@ -1,4 +1,10 @@
+import type { SignatureOwner } from '$lib/firebase/signatures';
+
 type IHeatForm = [
+	{
+		name: 'meta';
+		signatures: { [key in SignatureOwner]: string };
+	},
 	{
 		name: 'header';
 		fields: {
@@ -48,10 +54,11 @@ type IHeatForm = [
 ];
 
 export enum HeatFormIndexes {
-	header = 0,
-	employeeData = 1,
-	equipmentData = 2,
-	sampleData = 3
+	meta = 0,
+	header = 1,
+	employeeData = 2,
+	equipmentData = 3,
+	sampleData = 4
 }
 
 export enum HeatFormLabels {

@@ -5,10 +5,8 @@ import {
 	FormIndexes,
 	FormLabels,
 	FormSections,
-	ValuationTypesDisplayName,
 	type ValuationTypes
 } from '$lib/interfaces/forms/common';
-import { browser } from '$app/environment';
 
 const logoWidth = 58;
 const logoHeight = 16;
@@ -16,11 +14,9 @@ const xMargin = 10;
 const yMargin = 10;
 const textGap = 1.75;
 
-export const generatePdf = (
-	form: IHeatForm,
-	currentUserDisplayName: string,
-	type: ValuationTypes
-) => {
+export const generatePdf = (form: IHeatForm, type: ValuationTypes) => {
+	console.log(form[0].signatures);
+
 	const formLabels = FormLabels[type as keyof typeof FormLabels];
 	const formSections = FormSections[type as keyof typeof FormSections];
 	const formIndexes = FormIndexes[type as keyof typeof FormIndexes];
@@ -44,6 +40,7 @@ export const generatePdf = (
 	};
 
 	const pageWidth = doc.internal.pageSize.getWidth();
+	const pageHeight = doc.internal.pageSize.getHeight();
 	const headerHeight = lineHeight * 6 + yMargin + textGap * 5;
 	const maxHeaderTextWidth = pageWidth - logoWidth - xMargin * 2;
 	const maxBodyTextWidth = pageWidth - xMargin * 2;
@@ -74,7 +71,7 @@ export const generatePdf = (
 	let previousHeight = headerHeight;
 
 	form.forEach((section, index) => {
-		if (section.name === 'header') return;
+		if (section.name === 'meta' || section.name === 'header') return;
 
 		fontSize === 10 && changeFontSize(15);
 
@@ -108,6 +105,41 @@ export const generatePdf = (
 			previousHeight += lineHeight + fieldMarginTop;
 		});
 	});
+
+	const { evalueted: evaluatedSignature, evaluator: evaluatorSignature } =
+		form[FormIndexes.heat.meta].signatures;
+
+	if (evaluatorSignature != '') {
+		doc.addImage({
+			imageData: evaluatorSignature,
+			x: xMargin,
+			y: pageHeight - 44 - lineHeight,
+			width: 80,
+			height: 30
+		});
+	}
+
+	doc.text(
+		'Responsável Técnico avaliador',
+		(80 - doc.getTextWidth('Responsável Técnico avaliador')) / 2 + xMargin,
+		pageHeight - lineHeight
+	);
+
+	if (evaluatedSignature != '') {
+		doc.addImage({
+			imageData: evaluatedSignature,
+			x: pageWidth - xMargin - 80,
+			y: pageHeight - 44 - lineHeight,
+			width: 80,
+			height: 30
+		});
+	}
+
+	doc.text(
+		'Colaborador Avaliado',
+		pageWidth - xMargin - 80 + (80 - doc.getTextWidth('Colaborador Avaliado')) / 2,
+		pageHeight - lineHeight
+	);
 
 	// doc.save(
 	// 	`${ValuationTypesDisplayName[type]}_${currentUserDisplayName}_${
