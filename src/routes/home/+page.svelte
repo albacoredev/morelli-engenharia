@@ -8,7 +8,7 @@
 
 	userStore.subscribe((store) => (currentUserStore = store));
 
-	let userDisplayName = currentUserStore.user?.displayName ?? '';
+	let userDisplayName = currentUserStore?.user?.email?.split('@')[0] ?? '';
 	let greeting = '';
 
 	const time = new Date().toLocaleTimeString('pt-BR', {
