@@ -10,6 +10,8 @@
 	import { goto } from '$app/navigation';
 	import { Timestamp } from 'firebase/firestore';
 	import { onDestroy, onMount } from 'svelte';
+	import SignatureCanvas from '$lib/components/SignatureCanvas.svelte';
+	import { SignatureOwner } from '$lib/firebase/signatures';
 
 	let currentUserStore: UserStore = {
 		user: null,
@@ -365,6 +367,9 @@
 			name="totalTime"
 			disabled
 		/>
+
+		<SignatureCanvas holder={SignatureOwner.Evaluated} />
+		<SignatureCanvas holder={SignatureOwner.Evaluator} />
 
 		<div class="w-full flex justify-center py-8">
 			{#if savingValuation}

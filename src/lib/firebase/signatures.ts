@@ -1,7 +1,7 @@
 import { ref, uploadString } from 'firebase/storage';
 import { storage } from './firebase';
 
-export enum signatureOwner {
+export enum SignatureOwner {
 	Evaluator = 'evaluator',
 	Evaluated = 'evalueted'
 }
@@ -9,7 +9,7 @@ export enum signatureOwner {
 export const uploadBase64Signature = async (
 	base64: string,
 	valuationId: string,
-	holder: signatureOwner
+	holder: SignatureOwner
 ) => {
 	const metadata = {
 		contentType: 'image/jpeg'

@@ -44,6 +44,7 @@
 		"firebase": "^9.19.1",
 		"imask": "^6.5.1-alpha.1",
 		"jspdf": "^2.5.1",
+		"signature_pad": "^4.1.6",
 		"vest": "^4.6.9"
 	}
 }
