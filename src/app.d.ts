@@ -9,4 +9,10 @@ declare global {
 	}
 }
 
+declare global {
+	interface Window {
+		photoModal: HTMLDialogElement;
+	}
+}
+
 export {};

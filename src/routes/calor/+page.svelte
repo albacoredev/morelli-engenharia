@@ -137,6 +137,8 @@
 </script>
 
 <div class="flex flex-col items-center my-0 mx-auto justify-center">
+	<!-- <input id="myFileInput" type="file" accept="image/*;capture=camera" placeholder="photo" /> -->
+
 	<div class="navbar bg-base-100">
 		<div class="flex-none">
 			<a href="./home">

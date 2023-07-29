@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Loading from '$lib/components/Loading.svelte';
+	import PhotoItem from '$lib/components/PhotoItem.svelte';
 	import { ValuationTypesDisplayName, type ValuationTypes } from '$lib/interfaces/forms/common';
 	import type IHeatForm from '$lib/interfaces/forms/heat';
 	import { HeatFormIndexes } from '$lib/interfaces/forms/heat';
@@ -54,6 +55,8 @@
 
 		window.open(url, '_blank');
 	};
+
+	const photos = [1, 2, 3, 4, 5];
 </script>
 
 <div class="navbar bg-base-100">
@@ -95,6 +98,7 @@
 				<th>Criado</th>
 				<th>Atualizado</th>
 				<th />
+				<th />
 			</tr>
 		</thead>
 		<tbody>
@@ -104,7 +108,7 @@
 				{#each rows as row}
 					<tr>
 						<td>{ValuationTypesDisplayName[row.type]}</td>
-						<!--TODO-->
+						<!--TODO fallback -->
 						<td>{row.company}</td>
 						<td>{row.createdAt}</td>
 						<td>{row.updatedAt}</td>
@@ -116,9 +120,43 @@
 								}}>PDF</button
 							></td
 						>
+						<td
+							><button class="btn btn-sm btn-primary" on:click={() => window.photoModal.showModal()}
+								>fotos</button
+							></td
+						>
 					</tr>
 				{/each}
 			{/if}
 		</tbody>
 	</table>
 </div>
+
+<dialog id="photoModal" class="bg-transparent">
+	<form method="dialog" class="bg-base-100 p-4 rounded-lg">
+		<div class="flex gap-2 mb-4">
+			{#if photos.length > 4}
+				<div class="tooltip tooltip-open tooltip-error" data-tip="Máximo de 5 fotos">
+					<button type="button" class="btn btn-primary btn-disabled"> adcionar fotos </button>
+				</div>
+			{:else}
+				<button type="button" class="btn btn-primary"> adcionar fotos </button>
+			{/if}
+			<button type="button" class="btn btn-primary" class:btn-disabled={photos.length < 1}>
+				baixar fotos
+			</button>
+		</div>
+		{#if photos.length > 0}
+			<div class="flex flex-col gap-8">
+				<PhotoItem />
+				<PhotoItem />
+				<PhotoItem />
+			</div>
+		{:else}
+			<span>Sem fotos</span>
+		{/if}
+		<div class="modal-action">
+			<button class="btn btn-primary">fechar</button>
+		</div>
+	</form>
+</dialog>
