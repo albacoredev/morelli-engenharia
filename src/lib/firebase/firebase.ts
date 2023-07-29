@@ -2,8 +2,13 @@
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { connectStorageEmulator, getStorage } from 'firebase/storage';
-import { connectFirestoreEmulator, getFirestore } from '@firebase/firestore';
-import { connectAuthEmulator, getAuth } from 'firebase/auth';
+import { connectFirestoreEmulator, getFirestore, initializeFirestore } from '@firebase/firestore';
+import {
+	browserSessionPersistence,
+	connectAuthEmulator,
+	getAuth,
+	setPersistence
+} from 'firebase/auth';
 import { browser } from '$app/environment';
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -22,15 +27,21 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const storage = getStorage();
 const analytics = null; // getAnalytics(app);
 const auth = getAuth(app);
+let db;
 
 if (browser && window.location.href.includes('localhost')) {
+	db = initializeFirestore(app, { experimentalForceLongPolling: true });
+
+	setPersistence(auth, browserSessionPersistence);
+
 	connectAuthEmulator(auth, 'http://localhost:9099');
 	connectFirestoreEmulator(db, 'localhost', 8080);
 	connectStorageEmulator(storage, 'localhost', 9199);
+} else {
+	db = getFirestore(app);
 }
 
 export { db, analytics, auth, storage };
