@@ -10,6 +10,8 @@
 	import { goto } from '$app/navigation';
 	import { Timestamp } from 'firebase/firestore';
 	import { onDestroy, onMount } from 'svelte';
+	import SignatureCanvas from '$lib/components/SignatureCanvas.svelte';
+	import { SignatureOwner } from '$lib/firebase/signatures';
 
 	let currentUserStore: UserStore = {
 		user: null,
@@ -18,7 +20,16 @@
 
 	userStore.subscribe((store) => (currentUserStore = store));
 
+	const signatures = {
+		[SignatureOwner.Evaluated]: '',
+		[SignatureOwner.Evaluator]: ''
+	};
+
 	let form: IHeatForm = [
+		{
+			name: 'meta',
+			signatures
+		},
 		{
 			name: 'header',
 			fields: {
@@ -365,6 +376,9 @@
 			name="totalTime"
 			disabled
 		/>
+
+		<SignatureCanvas holder={SignatureOwner.Evaluated} bind:value={signatures.evalueted} />
+		<SignatureCanvas holder={SignatureOwner.Evaluator} bind:value={signatures.evaluator} />
 
 		<div class="w-full flex justify-center py-8">
 			{#if savingValuation}

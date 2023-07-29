@@ -7,6 +7,8 @@ const notRequiredFields = ['temperature', 'humidity', 'wind'];
 
 const suite = create((data: IHeatForm) => {
 	data.forEach((section) => {
+		if (section.name == 'meta') return;
+
 		const { fields } = section;
 
 		Object.keys(fields).forEach((field) => {

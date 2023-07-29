@@ -49,8 +49,8 @@
 		});
 	});
 
-	const downloadPDF = (form: IHeatForm, author: string, type: string) => {
-		const url = generatePdf(form, author, type as ValuationTypes);
+	const downloadPDF = (form: IHeatForm, type: string) => {
+		const url = generatePdf(form, type as ValuationTypes);
 
 		window.open(url, '_blank');
 	};
@@ -112,7 +112,7 @@
 							><button
 								class="btn btn-primary btn-sm"
 								on:click={() => {
-									downloadPDF(row.formData, userDisplayName, row.type);
+									downloadPDF(row.formData, row.type);
 								}}>PDF</button
 							></td
 						>
