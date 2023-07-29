@@ -2,7 +2,12 @@
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { connectStorageEmulator, getStorage } from 'firebase/storage';
-import { connectFirestoreEmulator, getFirestore, initializeFirestore } from '@firebase/firestore';
+import {
+	connectFirestoreEmulator,
+	Firestore,
+	getFirestore,
+	initializeFirestore
+} from '@firebase/firestore';
 import {
 	browserSessionPersistence,
 	connectAuthEmulator,
@@ -30,7 +35,7 @@ const app = initializeApp(firebaseConfig);
 const storage = getStorage();
 const analytics = null; // getAnalytics(app);
 const auth = getAuth(app);
-let db;
+let db: Firestore;
 
 if (browser && window.location.href.includes('localhost')) {
 	db = initializeFirestore(app, { experimentalForceLongPolling: true });
