@@ -18,7 +18,7 @@
 		{/if}
 	</div>
 	<div class="flex flex-col gap-2">
-		{#each options as option}
+		{#each options as option, index}
 			<div class="form-control">
 				<label class="flex items-center gap-2 cursor-pointer">
 					<input
@@ -29,6 +29,8 @@
 						class:radio-primary={!error}
 						bind:group={selected}
 						value={option}
+						data-cy={`radio-${name}`}
+						data-cy-radio-index={index}
 					/>
 					<span class="label-text">{option}</span>
 				</label>

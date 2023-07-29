@@ -9,10 +9,9 @@
 	export let type: 'text' | 'textArea' | 'password' = 'text';
 	export let disabled = false;
 	export let autocomplete = 'off';
+	export let dataCyType = 'text';
 
 	export let result: SuiteResult | undefined = undefined;
-
-	export let dataCy: string = '';
 
 	$: error = result?.getErrors()[name]?.length ?? 0 > 0;
 </script>
@@ -32,6 +31,8 @@
 			bind:value
 			{disabled}
 			{autocomplete}
+			data-cy={!disabled && `input-${name}`}
+			data-cy-type={dataCyType}
 		/>
 	{:else if type === 'text'}
 		<input
@@ -45,7 +46,8 @@
 			bind:value
 			{disabled}
 			{autocomplete}
-			data-cy={dataCy}
+			data-cy={!disabled && `input-${name}`}
+			data-cy-type={dataCyType}
 		/>
 	{:else if type === 'password'}
 		<input
@@ -59,7 +61,8 @@
 			bind:value
 			{disabled}
 			{autocomplete}
-			data-cy={dataCy}
+			data-cy={!disabled && `input-${name}`}
+			data-cy-type={dataCyType}
 		/>
 	{/if}
 

@@ -31,7 +31,7 @@
 	});
 </script>
 
-<div class="w-full flex flex-col gap-2 py-4">
+<div class="w-full flex flex-col gap-2 py-4 items-center">
 	{#if holder == SignatureOwner.Evaluator}
 		<span class="label-text">Assinatura do Responsável Técnico Avaliador</span>
 	{:else if holder == SignatureOwner.Evaluated}
@@ -39,8 +39,9 @@
 	{/if}
 	<canvas
 		bind:this={canvas}
-		class="bg-white w-full border border-primary rounded-lg h-[160px]"
+		class="bg-white border border-primary rounded-lg h-[160px] w-[440px]"
 		id="canvas"
+		data-cy="canvas"
 	/>
 	<button on:click={clearSignPad} class="btn btn-primary btn-sm">resetar</button>
 </div>
