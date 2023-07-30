@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Loading from '$lib/components/Loading.svelte';
 	import PhotoItem from '$lib/components/PhotoItem.svelte';
+	import { uploadPhoto } from '$lib/firebase/photos';
 	import { ValuationTypesDisplayName, type ValuationTypes } from '$lib/interfaces/forms/common';
 	import type IHeatForm from '$lib/interfaces/forms/heat';
 	import { HeatFormIndexes } from '$lib/interfaces/forms/heat';
@@ -9,6 +10,7 @@
 	import { onMount } from 'svelte';
 
 	interface ITableRow {
+		id: string;
 		type: keyof typeof ValuationTypesDisplayName;
 		company: string;
 		createdAt: string;
@@ -38,6 +40,7 @@
 
 		rows = valuations.map((valuation) => {
 			return {
+				id: valuation.id,
 				type: valuation.meta.type,
 				company:
 					valuation.data[HeatFormIndexes.header].fields.company === ''
@@ -58,9 +61,11 @@
 
 	const photos = [1];
 
+	let currentValuation: string | undefined = undefined;
 	let videoElement: HTMLVideoElement;
 	let canvasElement: HTMLCanvasElement;
 	let stream: MediaStream;
+	let imageDataUrl = '';
 
 	const startCamera = async () => {
 		window.cameraModal.showModal();
@@ -98,7 +103,13 @@
 			.getContext('2d')
 			?.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
 
-		let image_data_url = canvasElement.toDataURL('image/jpeg');
+		imageDataUrl = canvasElement.toDataURL('image/jpeg');
+	};
+
+	const uploadTakenPhoto = (id: string | undefined) => {
+		if (!currentValuation) return;
+
+		uploadPhoto(imageDataUrl.split(',')[1], id as string);
 	};
 </script>
 
@@ -164,8 +175,12 @@
 							></td
 						>
 						<td
-							><button class="btn btn-sm btn-primary" on:click={() => window.photoModal.showModal()}
-								>fotos</button
+							><button
+								class="btn btn-sm btn-primary"
+								on:click={() => {
+									currentValuation = row.id;
+									window.photoModal.showModal();
+								}}>fotos</button
 							></td
 						>
 					</tr>
@@ -238,6 +253,9 @@
 	<form method="dialog" class="bg-base-100 p-4 rounded-lg">
 		<canvas bind:this={canvasElement} />
 		<div class="modal-action">
+			<button class="btn btn-primary" on:click={() => uploadTakenPhoto(currentValuation)}
+				>salvar</button
+			>
 			<button class="btn btn-primary">fechar</button>
 		</div>
 	</form>
