@@ -1,4 +1,5 @@
-import { listAll, ref, uploadString } from 'firebase/storage';
+import { photosStore } from '$lib/store';
+import { getDownloadURL, listAll, ref, uploadString } from 'firebase/storage';
 import { storage } from './firebase';
 
 export const uploadPhoto = async (base64: string, valuationId: string) => {
@@ -16,4 +17,24 @@ export const uploadPhoto = async (base64: string, valuationId: string) => {
 	const photoRef = ref(storage, `valuationPhotos/${valuationId}/${storageSize + 1}`);
 
 	uploadString(photoRef, base64, 'base64', metadata);
+};
+
+export const downloadPhotos = async (valuationId: string) => {
+	photosStore.update((curr) => ({ ...curr, loading: true }));
+
+	const storageRef = ref(storage, `valuationPhotos/${valuationId}/`);
+
+	listAll(storageRef)
+		.then(async (res) => {
+			const { items } = res;
+			const urls = await Promise.all(items.map((item) => getDownloadURL(item)));
+
+			photosStore.update(() => ({
+				photosUrls: urls,
+				loading: false
+			}));
+		})
+		.catch((error) => {
+			// Uh-oh, an error occurred!
+		});
 };
