@@ -1,11 +1,18 @@
 <script lang="ts">
 	import Loading from '$lib/components/Loading.svelte';
 	import PhotoItem from '$lib/components/PhotoItem.svelte';
-	import { uploadPhoto } from '$lib/firebase/photos';
+	import { downloadPhotos, uploadPhoto } from '$lib/firebase/photos';
 	import { ValuationTypesDisplayName, type ValuationTypes } from '$lib/interfaces/forms/common';
 	import type IHeatForm from '$lib/interfaces/forms/heat';
 	import { HeatFormIndexes } from '$lib/interfaces/forms/heat';
-	import { userStore, valuationsHandlers, type UserStore } from '$lib/store';
+	import {
+		userStore,
+		valuationsHandlers,
+		type UserStore,
+		photosHandlers,
+		photosStore,
+		type PhotosStore
+	} from '$lib/store';
 	import { generatePdf } from '$lib/utils/generatePdf';
 	import { onMount } from 'svelte';
 
@@ -23,12 +30,17 @@
 		loading: false
 	};
 
+	userStore.subscribe((store) => (currentUserStore = store));
+
+	let currentPhotosStore: PhotosStore = {
+		photosUrls: undefined,
+		loading: true
+	};
+
+	photosStore.subscribe((store) => (currentPhotosStore = store));
+
 	let rows: ITableRow[] = [];
 	let valuationsLoading = true;
-
-	userStore.subscribe((store) => {
-		currentUserStore = store;
-	});
 
 	let userDisplayName = currentUserStore?.user?.email?.split('@')[0] ?? '';
 
@@ -59,13 +71,17 @@
 		window.open(url, '_blank');
 	};
 
-	const photos = [1];
-
 	let currentValuation: string | undefined = undefined;
 	let videoElement: HTMLVideoElement;
 	let canvasElement: HTMLCanvasElement;
 	let stream: MediaStream;
 	let imageDataUrl = '';
+
+	const openPhotosDialog = (valuationId: string) => {
+		currentValuation = valuationId;
+		window.photoModal.showModal();
+		downloadPhotos(valuationId);
+	};
 
 	const startCamera = async () => {
 		window.cameraModal.showModal();
@@ -111,6 +127,14 @@
 
 		uploadPhoto(imageDataUrl.split(',')[1], id as string);
 	};
+
+	const getPhotosUrls = (valuationId: string) => {
+		if (!valuationId) return;
+
+		photosHandlers.read(valuationId);
+	};
+
+	$: currentValuation && getPhotosUrls(currentValuation);
 </script>
 
 <div class="navbar bg-base-100">
@@ -178,8 +202,7 @@
 							><button
 								class="btn btn-sm btn-primary"
 								on:click={() => {
-									currentValuation = row.id;
-									window.photoModal.showModal();
+									openPhotosDialog(row.id);
 								}}>fotos</button
 							></td
 						>
@@ -192,26 +215,34 @@
 
 <dialog id="photoModal" class="bg-transparent">
 	<form method="dialog" class="bg-base-100 p-4 rounded-lg">
-		<div class="flex gap-2 mb-4">
-			{#if photos.length > 4}
-				<div class="tooltip tooltip-open tooltip-error" data-tip="Máximo de 5 fotos">
-					<button type="button" class="btn btn-primary btn-disabled"> adcionar fotos </button>
-				</div>
-			{:else}
-				<button class="btn btn-primary" on:click={startCamera}>tirar foto</button>
-			{/if}
-			<button type="button" class="btn btn-primary" class:btn-disabled={photos.length < 1}>
-				baixar fotos
-			</button>
-		</div>
-		{#if photos.length > 0}
+		{#if currentPhotosStore.photosUrls && !currentPhotosStore.loading}
+			<div class="flex gap-2 mb-4">
+				{#if currentPhotosStore.photosUrls.length > 4}
+					<div class="tooltip tooltip-open tooltip-error" data-tip="Máximo de 5 fotos">
+						<button type="button" class="btn btn-primary btn-disabled"> adcionar fotos </button>
+					</div>
+				{:else}
+					<button class="btn btn-primary" on:click={startCamera}>tirar foto</button>
+				{/if}
+				<button
+					type="button"
+					class="btn btn-primary"
+					class:btn-disabled={currentPhotosStore.photosUrls.length < 1}
+				>
+					baixar fotos
+				</button>
+			</div>
 			<div class="flex flex-col gap-8">
-				<PhotoItem />
-				<PhotoItem />
-				<PhotoItem />
+				{#if currentPhotosStore.photosUrls.length === 0}
+					<span>Sem fotos</span>
+				{:else}
+					{#each currentPhotosStore.photosUrls as url}
+						<PhotoItem src={url} />
+					{/each}
+				{/if}
 			</div>
 		{:else}
-			<span>Sem fotos</span>
+			<span>Carregando...</span>
 		{/if}
 		<div class="modal-action">
 			<button class="btn btn-primary">fechar</button>
