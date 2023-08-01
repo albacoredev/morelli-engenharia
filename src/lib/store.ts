@@ -1,7 +1,7 @@
 import { signInWithEmailAndPassword, signOut, type User } from 'firebase/auth';
 import { writable } from 'svelte/store';
 import { auth } from './firebase/firebase';
-import { downloadPhotos } from './firebase/photos';
+import { deletePhoto, downloadPhotos } from './firebase/photos';
 import { readValuations } from './firebase/valuations';
 
 export interface UserStore {
@@ -12,6 +12,7 @@ export interface UserStore {
 export interface PhotosStore {
 	photosUrls: Array<string> | undefined;
 	loading: boolean;
+	valuationId: string;
 }
 
 export const userStore = writable<UserStore>({
@@ -21,7 +22,8 @@ export const userStore = writable<UserStore>({
 
 export const photosStore = writable<PhotosStore>({
 	photosUrls: undefined,
-	loading: true
+	loading: true,
+	valuationId: ''
 });
 
 export const authHandlers = {
@@ -35,5 +37,6 @@ export const valuationsHandlers = {
 };
 
 export const photosHandlers = {
-	read: async (valuationId: string) => await downloadPhotos(valuationId)
+	read: async (valuationId: string) => await downloadPhotos(valuationId),
+	['delete']: async (photoUrl: string) => await deletePhoto(photoUrl)
 };

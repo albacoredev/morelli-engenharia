@@ -1,5 +1,5 @@
 import { photosStore } from '$lib/store';
-import { getDownloadURL, listAll, ref, uploadString } from 'firebase/storage';
+import { deleteObject, getDownloadURL, listAll, ref, uploadString } from 'firebase/storage';
 import { storage } from './firebase';
 
 export const uploadPhoto = async (base64: string, valuationId: string) => {
@@ -19,7 +19,7 @@ export const uploadPhoto = async (base64: string, valuationId: string) => {
 	uploadString(photoRef, base64, 'base64', metadata);
 };
 
-export const downloadPhotos = async (valuationId: string) => {
+export const downloadPhotos = async (valuationId?: string) => {
 	photosStore.update((curr) => ({ ...curr, loading: true }));
 
 	const storageRef = ref(storage, `valuationPhotos/${valuationId}/`);
@@ -29,10 +29,24 @@ export const downloadPhotos = async (valuationId: string) => {
 			const { items } = res;
 			const urls = await Promise.all(items.map((item) => getDownloadURL(item)));
 
-			photosStore.update(() => ({
+			photosStore.update((curr) => ({
 				photosUrls: urls,
-				loading: false
+				loading: false,
+				valuationId: valuationId ? valuationId : curr.valuationId
 			}));
+		})
+		.catch((error) => {
+			// Uh-oh, an error occurred!
+		});
+};
+
+export const deletePhoto = async (url: string) => {
+	const photoRef = ref(storage, encodeURI(url));
+
+	// Delete the file
+	deleteObject(photoRef)
+		.then(() => {
+			downloadPhotos();
 		})
 		.catch((error) => {
 			// Uh-oh, an error occurred!

@@ -34,7 +34,8 @@
 
 	let currentPhotosStore: PhotosStore = {
 		photosUrls: undefined,
-		loading: true
+		loading: true,
+		valuationId: ''
 	};
 
 	photosStore.subscribe((store) => (currentPhotosStore = store));
