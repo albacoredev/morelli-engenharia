@@ -1,4 +1,4 @@
-import { photosStore } from '$lib/store';
+import { photosStore, type PhotosStore } from '$lib/store';
 import { deleteObject, getDownloadURL, listAll, ref, uploadString } from 'firebase/storage';
 import { storage } from './firebase';
 
@@ -20,14 +20,22 @@ export const uploadPhoto = async (base64: string, valuationId: string) => {
 };
 
 export const downloadPhotos = async (valuationId?: string) => {
+	let currentPhotosStore: PhotosStore = {} as PhotosStore;
+	photosStore.subscribe((store) => (currentPhotosStore = store));
+
 	photosStore.update((curr) => ({ ...curr, loading: true }));
 
-	const storageRef = ref(storage, `valuationPhotos/${valuationId}/`);
+	const storageRef = ref(
+		storage,
+		`valuationPhotos/${valuationId || currentPhotosStore.valuationId}/`
+	);
 
 	listAll(storageRef)
 		.then(async (res) => {
 			const { items } = res;
 			const urls = await Promise.all(items.map((item) => getDownloadURL(item)));
+
+			console.log(urls);
 
 			photosStore.update((curr) => ({
 				photosUrls: urls,
