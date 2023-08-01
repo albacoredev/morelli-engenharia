@@ -225,13 +225,6 @@
 				{:else}
 					<button class="btn btn-primary" on:click={startCamera}>tirar foto</button>
 				{/if}
-				<button
-					type="button"
-					class="btn btn-primary"
-					class:btn-disabled={currentPhotosStore.photosUrls.length < 1}
-				>
-					baixar fotos
-				</button>
 			</div>
 			<div class="flex flex-col gap-8">
 				{#if currentPhotosStore.photosUrls.length === 0}
