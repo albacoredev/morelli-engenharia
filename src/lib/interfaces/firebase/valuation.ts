@@ -10,6 +10,7 @@ interface Meta {
 }
 
 export default interface IHeatValuationDoc {
+	id: string;
 	meta: Meta;
 	data: IHeatForm;
 }

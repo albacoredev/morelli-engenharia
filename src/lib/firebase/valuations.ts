@@ -18,7 +18,7 @@ export const readValuations = async (userId: string) => {
 	const valuationsSnapshot = await getDocs(valuationsQuery);
 
 	const documents = valuationsSnapshot.docs;
-	const valuations = documents.map((doc) => doc.data()) as IHeatValuationDoc[];
+	const valuations = documents.map((doc) => ({ id: doc.id, ...doc.data() })) as IHeatValuationDoc[];
 
 	return valuations;
 };
