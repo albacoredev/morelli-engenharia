@@ -1,7 +1,7 @@
 import type IHeatValuationDoc from '$lib/interfaces/firebase/docs';
 import type { IHeatForm } from '$lib/interfaces/forms/heat';
 import { userStore, type UserStore } from '$lib/store';
-import { addDoc, collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { addDoc, collection, FirestoreError, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from './firebase';
 
 export const addValuation = async (valuation: IHeatForm) => {
@@ -16,9 +16,13 @@ export const addValuation = async (valuation: IHeatForm) => {
 		throw new Error('Adding a valuation requires authentication');
 	}
 
-	const valuationsRef = collection(db, 'technitians', currentUserStore.user.uid, 'valuations');
-
-	await addDoc(valuationsRef, valuation);
+	try {
+		const valuationsRef = collection(db, 'technitians', currentUserStore.user.uid, 'valuations');
+		await addDoc(valuationsRef, valuation);
+	} catch (error) {
+		const firestoreError = error as FirestoreError;
+		throw new Error(firestoreError.message);
+	}
 };
 
 export const readValuations = async (userId: string) => {

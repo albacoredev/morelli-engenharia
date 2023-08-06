@@ -37,13 +37,10 @@
 
 	let createdDate = '';
 
-	const indexOfHeat = Object.values(EValuationTypesDisplayName).indexOf(
-		'heat' as unknown as EValuationTypesDisplayName
-	);
 	const form = {
-		type: Object.keys(EValuationTypesDisplayName)[indexOfHeat],
+		type: 'heat',
 		signatures
-	} as IHeatForm; //TODO Enum
+	} as IHeatForm;
 
 	let result = suite.get();
 
