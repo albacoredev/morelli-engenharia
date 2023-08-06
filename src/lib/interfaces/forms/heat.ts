@@ -100,3 +100,37 @@ export const heatSections: THeatValuationPDFSections = {
 		'totalTime'
 	]
 };
+
+type THeatLabels = {
+	[key in keyof IHeatForm]: string;
+};
+
+export const heatLabels: Omit<THeatLabels, 'signatures' | 'type'> = {
+	company: 'Empresa',
+	date: 'Data',
+	sampleNumber: 'Número da Amostragem',
+	valuation: 'Avaliação',
+	methodology: 'Metodologia',
+	name: 'Nome',
+	function: 'Função',
+	sector: 'Setor',
+	ghe: 'GHE',
+	epi: 'EPI',
+	epc: 'epc',
+	brand: 'Marca',
+	model: 'Modelo',
+	serialNumber: 'Número de Série',
+	climaticConditions: 'Condições Climáticas',
+	environment: 'Ambiente',
+	ventilation: 'Ventilação',
+	enviromentSolarIncidence: 'Ambiente',
+	heatSource: 'Fonte de Calor',
+	rest: 'Descanso',
+	activities: 'Atividade',
+	temperature: 'Temperatura',
+	humidity: 'Umidade',
+	wind: 'Vento',
+	startingTime: 'Hora Inicial',
+	endingTime: 'Hora Final',
+	totalTime: 'Tempo total'
+};

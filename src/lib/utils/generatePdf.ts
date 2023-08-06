@@ -1,4 +1,4 @@
-import { heatSections, type IHeatForm } from '$lib/interfaces/forms/heat';
+import { heatLabels, heatSections, type IHeatForm } from '$lib/interfaces/forms/heat';
 import jsPDF from 'jspdf';
 import encondedImage from '$lib/images/morelli_logo.json';
 import { EValuationTypesDisplayName } from '$lib/interfaces/forms/common';
@@ -89,7 +89,10 @@ export const generatePdf = (valuation: IHeatForm) => {
 		changeFontSize(10);
 
 		fields.forEach((field) => {
-			const fieldText = trimText(`${field}: ${String(form[field])}`, maxBodyTextWidth); // Todo Enum
+			const fieldText = trimText(
+				`${heatLabels[field as keyof typeof heatLabels]}: ${String(form[field])}`,
+				maxBodyTextWidth
+			);
 			doc.text(fieldText, xMargin, previousHeight + lineHeight + fieldMarginTop);
 			previousHeight += lineHeight + fieldMarginTop;
 		});
