@@ -2,9 +2,7 @@
 	import Loading from '$lib/components/Loading.svelte';
 	import PhotoItem from '$lib/components/PhotoItem.svelte';
 	import { downloadPhotos, uploadPhoto } from '$lib/firebase/photos';
-	import { ValuationTypesDisplayName, type ValuationTypes } from '$lib/interfaces/forms/common';
-	import type IHeatForm from '$lib/interfaces/forms/heat';
-	import { HeatFormIndexes } from '$lib/interfaces/forms/heat';
+	import type { IHeatForm } from '$lib/interfaces/forms/heat';
 	import {
 		userStore,
 		valuationsHandlers,
@@ -18,10 +16,9 @@
 
 	interface ITableRow {
 		id: string;
-		type: keyof typeof ValuationTypesDisplayName;
+		type: string; // TODO Enum
 		company: string;
 		createdAt: string;
-		updatedAt: string;
 		formData: IHeatForm;
 	}
 
@@ -54,20 +51,16 @@
 		rows = valuations.map((valuation) => {
 			return {
 				id: valuation.id,
-				type: valuation.meta.type,
-				company:
-					valuation.data[HeatFormIndexes.header].fields.company === ''
-						? 'Não informado'
-						: valuation.data[HeatFormIndexes.header].fields.company,
-				createdAt: new Date(valuation.meta.createdAt.seconds * 1000).toLocaleDateString('pt-BR'),
-				updatedAt: new Date(valuation.meta.updatedAt.seconds * 1000).toLocaleDateString('pt-BR'),
+				type: valuation.data.type,
+				company: valuation.data.company === '' ? 'Não informado' : valuation.data.company,
+				createdAt: valuation.data.date.toDate().toLocaleDateString('pt-BR'),
 				formData: valuation.data
 			};
 		});
 	});
 
-	const downloadPDF = (form: IHeatForm, type: string) => {
-		const url = generatePdf(form, type as ValuationTypes);
+	const downloadPDF = (form: IHeatForm) => {
+		const url = generatePdf(form);
 
 		window.open(url, '_blank');
 	};
@@ -175,7 +168,6 @@
 				<th>Tipo</th>
 				<th>Empresa</th>
 				<th>Criado</th>
-				<th>Atualizado</th>
 				<th />
 				<th />
 			</tr>
@@ -186,16 +178,14 @@
 			{:else}
 				{#each rows as row}
 					<tr>
-						<td>{ValuationTypesDisplayName[row.type]}</td>
-						<!--TODO fallback -->
+						<td>{row.type}</td>
 						<td>{row.company}</td>
 						<td>{row.createdAt}</td>
-						<td>{row.updatedAt}</td>
 						<td
 							><button
 								class="btn btn-primary btn-sm"
 								on:click={() => {
-									downloadPDF(row.formData, row.type);
+									downloadPDF(row.formData);
 								}}>PDF</button
 							></td
 						>
