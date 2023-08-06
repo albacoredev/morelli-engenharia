@@ -2,7 +2,17 @@
 	import { browser } from '$app/environment';
 	import Input from '$lib/components/Input.svelte';
 	import Radio from '$lib/components/Radio.svelte';
-	import type { IHeatForm } from '$lib/interfaces/forms/heat';
+	import {
+		EActivitiesOptions,
+		EClimaticConditions,
+		EEnviromentOptions,
+		EEnviromentSolarIncidenceOptions,
+		EMethodologyOptions,
+		ERestOptions,
+		EValuationOptions,
+		EVentilationOptions,
+		type IHeatForm
+	} from '$lib/interfaces/forms/heat';
 	import { userStore, type UserStore } from '$lib/store';
 	import getTotalTime from '$lib/utils/getTotalTime';
 	import suite from '$lib/vestSuites/heat';
@@ -126,14 +136,14 @@
 			bind:result
 		/>
 		<Radio
-			options={['Individual', 'Ambiental']}
+			options={Object.values(EValuationOptions)}
 			name="valuation"
 			label="Avaliação"
 			bind:result
 			bind:selected={form.valuation}
 		/>
 		<Radio
-			options={['NR-15', 'NHO-06']}
+			options={Object.values(EMethodologyOptions)}
 			name="methodology"
 			label="Metodologia"
 			bind:result
@@ -171,7 +181,7 @@
 		</div>
 
 		<Radio
-			options={['Sol', 'Chuva', 'Nublado']}
+			options={Object.values(EClimaticConditions)}
 			name="climaticConditions"
 			label="Condições Climáticas"
 			bind:result
@@ -179,7 +189,7 @@
 		/>
 
 		<Radio
-			options={['Aberto', 'Fechado']}
+			options={Object.values(EEnviromentOptions)}
 			name="environment"
 			label="Ambiente"
 			bind:result
@@ -187,7 +197,7 @@
 		/>
 
 		<Radio
-			options={['Natural', 'Forçada']}
+			options={Object.values(EVentilationOptions)}
 			name="ventilation"
 			label="Ventilação"
 			bind:result
@@ -195,7 +205,7 @@
 		/>
 
 		<Radio
-			options={['Interno ou externo sem carga solar', 'Externo com carga solar']}
+			options={Object.values(EEnviromentSolarIncidenceOptions)}
 			name="enviromentSolarIncidence"
 			label="Ambiente"
 			bind:result
@@ -210,7 +220,7 @@
 		/>
 
 		<Radio
-			options={['No mesmo local', 'Outro ambiente']}
+			options={Object.values(ERestOptions)}
 			name="rest"
 			label="Descanso"
 			bind:result
@@ -218,7 +228,7 @@
 		/>
 
 		<Radio
-			options={['Leve', 'Moderada', 'Pesada']}
+			options={Object.values(EActivitiesOptions)}
 			name="activities"
 			label="Atividade"
 			bind:result
