@@ -18,9 +18,7 @@ export const addValuation = async (valuation: IHeatForm) => {
 
 	const valuationsRef = collection(db, 'technitians', currentUserStore.user.uid, 'valuations');
 
-	const docRef = await addDoc(valuationsRef, valuation);
-
-	console.log('Document written with ID: ', docRef.id);
+	await addDoc(valuationsRef, valuation);
 };
 
 export const readValuations = async (userId: string) => {

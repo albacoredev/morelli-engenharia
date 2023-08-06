@@ -2,13 +2,11 @@ import type { IHeatForm } from '$lib/interfaces/forms/heat';
 import hmsToSeconds from '$lib/utils/hmsToSeconds';
 import { create, test, enforce } from 'vest';
 
-const notRequiredFields = ['temperature', 'humidity', 'wind'];
+const notRequiredFields = ['temperature', 'humidity', 'wind', 'type', 'signatures'];
 
 const suite = create((data: IHeatForm) => {
 	Object.keys(data).forEach((field) => {
 		if (notRequiredFields.includes(field)) return;
-
-		console.log(field);
 
 		test(field, 'Campo obrigatório', () => {
 			enforce(data[field as keyof typeof data]).isNotEmpty();
