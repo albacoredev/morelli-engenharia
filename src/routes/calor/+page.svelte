@@ -21,6 +21,7 @@
 	import SignatureCanvas from '$lib/components/SignatureCanvas.svelte';
 	import { SignatureOwner } from '$lib/firebase/signatures';
 	import { Timestamp } from 'firebase/firestore';
+	import { EValuationTypesDisplayName } from '$lib/interfaces/forms/common';
 
 	let currentUserStore: UserStore = {
 		user: null,
@@ -36,7 +37,13 @@
 
 	let createdDate = '';
 
-	const form = { type: 'heat', signatures } as IHeatForm; //TODO Enum
+	const indexOfHeat = Object.values(EValuationTypesDisplayName).indexOf(
+		'heat' as unknown as EValuationTypesDisplayName
+	);
+	const form = {
+		type: Object.keys(EValuationTypesDisplayName)[indexOfHeat],
+		signatures
+	} as IHeatForm; //TODO Enum
 
 	let result = suite.get();
 

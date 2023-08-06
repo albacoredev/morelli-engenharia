@@ -2,6 +2,7 @@
 	import Loading from '$lib/components/Loading.svelte';
 	import PhotoItem from '$lib/components/PhotoItem.svelte';
 	import { downloadPhotos, uploadPhoto } from '$lib/firebase/photos';
+	import { EValuationTypesDisplayName } from '$lib/interfaces/forms/common';
 	import type { IHeatForm } from '$lib/interfaces/forms/heat';
 	import {
 		userStore,
@@ -16,7 +17,7 @@
 
 	interface ITableRow {
 		id: string;
-		type: string; // TODO Enum
+		type: keyof typeof EValuationTypesDisplayName;
 		company: string;
 		createdAt: string;
 		formData: IHeatForm;
@@ -178,7 +179,7 @@
 			{:else}
 				{#each rows as row}
 					<tr>
-						<td>{row.type}</td>
+						<td>{EValuationTypesDisplayName[row.type]}</td>
 						<td>{row.company}</td>
 						<td>{row.createdAt}</td>
 						<td

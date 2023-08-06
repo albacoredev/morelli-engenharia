@@ -1,5 +1,6 @@
 import type { SignatureOwner } from '$lib/firebase/signatures';
 import type { Timestamp } from 'firebase/firestore';
+import type { EValuationTypesDisplayName } from './common';
 
 export enum EValuationOptions {
 	INDIVIDUAL = 'Individual',
@@ -45,7 +46,7 @@ export enum EActivitiesOptions {
 
 export interface IHeatForm {
 	signatures: { [key in SignatureOwner]: string };
-	type: string;
+	type: keyof typeof EValuationTypesDisplayName;
 	company: string;
 	date: Timestamp;
 	sampleNumber: string;

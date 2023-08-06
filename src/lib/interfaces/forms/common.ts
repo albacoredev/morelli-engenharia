@@ -1,6 +1,4 @@
-export type ValuationTypes = 'heat' | 'noise' | 'vibration' | 'chemicalAgents';
-
-export enum ValuationTypesDisplayName {
+export enum EValuationTypesDisplayName {
 	heat = 'Calor',
 	noise = 'Ruído',
 	vibration = 'Vibração',

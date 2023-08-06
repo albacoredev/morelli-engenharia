@@ -1,6 +1,7 @@
 import { heatSections, type IHeatForm } from '$lib/interfaces/forms/heat';
 import jsPDF from 'jspdf';
 import encondedImage from '$lib/images/morelli_logo.json';
+import { EValuationTypesDisplayName } from '$lib/interfaces/forms/common';
 
 const logoWidth = 58;
 const logoHeight = 16;
@@ -41,7 +42,7 @@ export const generatePdf = (valuation: IHeatForm) => {
 		return trimText(fieldValue, maxHeaderTextWidth);
 	});
 
-	headerFields.unshift('Avaliação Quantitativa de ');
+	headerFields.unshift(`Avaliação Quantitativa de ${EValuationTypesDisplayName[form.type]}`);
 
 	doc.setFillColor(214, 211, 209);
 	doc.rect(0, 0, pageWidth, headerHeight, 'F');
@@ -88,7 +89,7 @@ export const generatePdf = (valuation: IHeatForm) => {
 		changeFontSize(10);
 
 		fields.forEach((field) => {
-			const fieldText = trimText(`${field}: ${form[field]}`, maxBodyTextWidth); // Todo Enum
+			const fieldText = trimText(`${field}: ${String(form[field])}`, maxBodyTextWidth); // Todo Enum
 			doc.text(fieldText, xMargin, previousHeight + lineHeight + fieldMarginTop);
 			previousHeight += lineHeight + fieldMarginTop;
 		});
