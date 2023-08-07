@@ -40,8 +40,16 @@
 	<div class="divider py-4">
 		<span class="text-lg text-secondary font-bold">Criar Nova Avaliação Quantitativa</span>
 	</div>
-	<a class="w-full" href="./calor"><button class="btn btn-primary w-full">calor</button></a>
-	<button class="btn btn-primary w-full btn-disabled">ruído</button>
-	<button class="btn btn-primary w-full btn-disabled">vibração</button>
-	<button class="btn btn-primary w-full btn-disabled">agentes químicos</button>
+	<a href="./nova-avaliacao/calor" class="w-full"
+		><button class="btn btn-primary w-full">calor</button></a
+	>
+	<a href="./nova-avaliacao/ruido" class="w-full"
+		><button class="btn btn-primary w-full">ruído</button></a
+	>
+	<a href="./nova-avaliacao/vibracao" class="w-full"
+		><button class="btn btn-primary w-full btn-disabled">vibração</button></a
+	>
+	<a href="./nova-avaliacao/agentes-quimicos" class="w-full"
+		><button class="btn btn-primary w-full btn-disabled">agentes químicos</button></a
+	>
 </div>

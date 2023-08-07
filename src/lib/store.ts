@@ -4,6 +4,7 @@ import { auth } from './firebase/firebase';
 import { deletePhoto, downloadPhotos } from './firebase/photos';
 import { addValuation, readValuations } from './firebase/valuations';
 import type { IHeatForm } from './interfaces/forms/heat';
+import type { INoiseForm } from './interfaces/forms/noise';
 
 export interface UserStore {
 	user: User | null;
@@ -42,7 +43,7 @@ export const authHandlers = {
 };
 
 export const valuationsHandlers = {
-	add: async (form: IHeatForm) => await addValuation(form),
+	add: async (form: IHeatForm | INoiseForm) => await addValuation(form),
 	read: async (uid: string) => await readValuations(uid)
 };
 
