@@ -62,6 +62,8 @@
 	<div class="flex flex-col gap-4 w-full">
 		<div
 			class="transition-opacity alert alert-error shadow-lg"
+			data-cy="div-login-error"
+			data-cy-error-message={firebaseError}
 			class:opacity-0={firebaseError === ''}
 			aria-hidden={firebaseError === '' ? 'true' : 'false'}
 		>
