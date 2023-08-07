@@ -1,12 +1,7 @@
-import type IHeatForm from '$lib/interfaces/forms/heat';
+import { heatLabels, heatSections, type IHeatForm } from '$lib/interfaces/forms/heat';
 import jsPDF from 'jspdf';
 import encondedImage from '$lib/images/morelli_logo.json';
-import {
-	FormIndexes,
-	FormLabels,
-	FormSections,
-	type ValuationTypes
-} from '$lib/interfaces/forms/common';
+import { EValuationTypesDisplayName } from '$lib/interfaces/forms/common';
 
 const logoWidth = 58;
 const logoHeight = 16;
@@ -14,14 +9,10 @@ const xMargin = 10;
 const yMargin = 10;
 const textGap = 1.75;
 
-export const generatePdf = (form: IHeatForm, type: ValuationTypes) => {
-	console.log(form[0].signatures);
-
-	const formLabels = FormLabels[type as keyof typeof FormLabels];
-	const formSections = FormSections[type as keyof typeof FormSections];
-	const formIndexes = FormIndexes[type as keyof typeof FormIndexes];
-
+export const generatePdf = (valuation: IHeatForm) => {
 	const doc = new jsPDF();
+
+	const form = { ...valuation, date: valuation.date.toDate().toLocaleDateString('pt-BR') };
 
 	let fontSize = 15;
 	const lineHeight = fontSize * 0.3;
@@ -45,9 +36,13 @@ export const generatePdf = (form: IHeatForm, type: ValuationTypes) => {
 	const maxHeaderTextWidth = pageWidth - logoWidth - xMargin * 2;
 	const maxBodyTextWidth = pageWidth - xMargin * 2;
 
-	const headerFields = Object.values(form[formIndexes.header].fields).map((value) =>
-		trimText(value, maxHeaderTextWidth)
-	);
+	const headerFields = (heatSections['header'] as Array<keyof typeof form>).map((field) => {
+		const fieldValue = form[field] as string;
+
+		return trimText(fieldValue, maxHeaderTextWidth);
+	});
+
+	headerFields.unshift(`Avaliação Quantitativa de ${EValuationTypesDisplayName[form.type]}`);
 
 	doc.setFillColor(214, 211, 209);
 	doc.rect(0, 0, pageWidth, headerHeight, 'F');
@@ -70,17 +65,17 @@ export const generatePdf = (form: IHeatForm, type: ValuationTypes) => {
 
 	let previousHeight = headerHeight;
 
-	form.forEach((section, index) => {
-		if (section.name === 'meta' || section.name === 'header') return;
+	Object.keys(heatSections).forEach((key) => {
+		const section = key as keyof typeof heatSections;
+
+		if (section === 'header') return;
 
 		fontSize === 10 && changeFontSize(15);
 
-		const name = trimText(formSections[section.name], maxBodyTextWidth);
-		const fields = section.fields;
+		const fields = heatSections[section];
+		const sectionNameWidth = doc.getTextWidth(key);
 
-		const sectionNameWidth = doc.getTextWidth(name);
-
-		doc.text(name, xMargin, previousHeight + lineHeight + sectionMarginTop);
+		doc.text(key, xMargin, previousHeight + lineHeight + sectionMarginTop);
 		doc.setLineWidth(0.5);
 		doc.line(
 			sectionNameWidth + xMargin + lineGap,
@@ -93,12 +88,9 @@ export const generatePdf = (form: IHeatForm, type: ValuationTypes) => {
 
 		changeFontSize(10);
 
-		Object.keys(fields).forEach((field) => {
-			const formLabelsIndex = field as keyof typeof formLabels;
-			const formFieldsIndex = field as keyof typeof fields;
-
+		fields.forEach((field) => {
 			const fieldText = trimText(
-				`${formLabels[formLabelsIndex]}: ${form[index].fields[formFieldsIndex]}`,
+				`${heatLabels[field as keyof typeof heatLabels]}: ${String(form[field])}`,
 				maxBodyTextWidth
 			);
 			doc.text(fieldText, xMargin, previousHeight + lineHeight + fieldMarginTop);
@@ -106,8 +98,7 @@ export const generatePdf = (form: IHeatForm, type: ValuationTypes) => {
 		});
 	});
 
-	const { evalueted: evaluatedSignature, evaluator: evaluatorSignature } =
-		form[FormIndexes.heat.meta].signatures;
+	const { evalueted: evaluatedSignature, evaluator: evaluatorSignature } = form.signatures;
 
 	if (evaluatorSignature != '') {
 		doc.addImage({
@@ -141,15 +132,7 @@ export const generatePdf = (form: IHeatForm, type: ValuationTypes) => {
 		pageHeight - lineHeight
 	);
 
-	// doc.save(
-	// 	`${ValuationTypesDisplayName[type]}_${currentUserDisplayName}_${
-	// 		form[FormIndexes[type as keyof typeof FormIndexes].header].fields.company
-	// 	}`
-	// );
-
 	const blob = doc.output('blob');
-
-	// Create a URL for the Blob
 	const url = URL.createObjectURL(blob);
 
 	return url;

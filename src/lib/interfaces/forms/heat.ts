@@ -1,100 +1,136 @@
 import type { SignatureOwner } from '$lib/firebase/signatures';
+import type { Timestamp } from 'firebase/firestore';
+import type { EValuationTypesDisplayName } from './common';
 
-type IHeatForm = [
-	{
-		name: 'meta';
-		signatures: { [key in SignatureOwner]: string };
-	},
-	{
-		name: 'header';
-		fields: {
-			company: string;
-			date: string;
-			sampleNumber: string;
-			valuation: 'Individual' | 'Ambiental' | '';
-			methodology: 'NR-15' | 'NHO-06' | '';
-		};
-	},
-	{
-		name: 'employeeData';
-		fields: {
-			name: string;
-			function: string;
-			sector: string;
-			ghe: string;
-			epi: string;
-			epc: string;
-		};
-	},
-	{
-		name: 'equipmentData';
-		fields: { brand: string; model: string; serialNumber: string };
-	},
-	{
-		name: 'sampleData';
-		fields: {
-			climaticConditions: 'Sol' | 'Chuva' | 'Nublado' | '';
-			environment: 'Aberto' | 'Fechado' | '';
-			ventilation: 'Natural' | 'Forçada' | '';
-			enviromentSolarIncidence:
-				| 'Inerno ou externo sem carga solar'
-				| 'Externo com carga solar'
-				| '';
-			heatSource: string;
-			rest: 'No mesmo local' | 'Outro ambiente' | '';
-			activities: 'Leve' | 'Moderada' | 'Pesada' | '';
-			temperature?: string;
-			humidity?: string;
-			wind?: string;
-			startingTime: string;
-			endingTime: string;
-			totalTime: string;
-		};
-	}
-];
-
-export enum HeatFormIndexes {
-	meta = 0,
-	header = 1,
-	employeeData = 2,
-	equipmentData = 3,
-	sampleData = 4
+export enum EValuationOptions {
+	INDIVIDUAL = 'Individual',
+	AMBIENTAL = 'Ambiental'
 }
 
-export enum HeatFormLabels {
-	company = 'Empresa',
-	date = 'Data',
-	sampleNumber = 'Número da amostragem',
-	valuation = 'Avaliação',
-	methodology = 'Metodologia',
-	name = 'Nome',
-	function = 'Função',
-	sector = 'Setor',
-	ghe = 'GHE',
-	epi = 'EPI',
-	epc = 'EPC',
-	brand = 'Marca',
-	model = 'Modelo',
-	serialNumber = 'Número de série',
-	climaticConditions = 'Condições climáticas',
-	environment = 'Ambiente',
-	ventilation = 'Ventilação',
-	enviromentSolarIncidence = 'Ambiente',
-	heatSource = 'Fonte de calor',
-	rest = 'Descanso',
-	activities = 'Atividades',
-	temperature = 'Temperatura',
-	humidity = 'Umidade',
-	wind = 'Vento',
-	startingTime = 'Hora de início',
-	endingTime = 'Hora de término',
-	totalTime = 'Tempo total'
+export enum EMethodologyOptions {
+	NR15 = 'NR-15',
+	NHO06 = 'NHO-06'
 }
 
-export enum HeatFormSections {
-	employeeData = 'Dados do colaborador',
-	equipmentData = 'Características dos Equipamentos de Trabalho',
-	sampleData = 'Dados da amostragem'
+export enum EClimaticConditions {
+	SUN = 'Sol',
+	RAIN = 'Chuva',
+	CLOUDY = 'Nublado'
 }
 
-export default IHeatForm;
+export enum EEnviromentOptions {
+	OPEN = 'Aberto',
+	CLOSED = 'Fechado'
+}
+
+export enum EVentilationOptions {
+	NATURAL = 'Natural',
+	FORCED = 'Forçada'
+}
+
+export enum EEnviromentSolarIncidenceOptions {
+	INTERNAL_OR_EXTERNAL = 'Interno ou externo sem carga solar',
+	EXTERNAL = 'Externo com carga solar'
+}
+
+export enum ERestOptions {
+	INLOCO = 'No mesmo local',
+	OUTSIDE = 'Outro ambiente'
+}
+
+export enum EActivitiesOptions {
+	LIGHT = 'Leve',
+	MODERATE = 'Moderada',
+	HEAVY = 'Pesada'
+}
+
+export interface IHeatForm {
+	signatures: { [key in SignatureOwner]: string };
+	type: keyof typeof EValuationTypesDisplayName;
+	company: string;
+	date: Timestamp;
+	sampleNumber: string;
+	valuation: EValuationOptions;
+	methodology: EMethodologyOptions;
+	name: string;
+	function: string;
+	sector: string;
+	ghe: string;
+	epi: string;
+	epc: string;
+	brand: string;
+	model: string;
+	serialNumber: string;
+	climaticConditions: EClimaticConditions;
+	environment: EEnviromentOptions;
+	ventilation: EVentilationOptions;
+	enviromentSolarIncidence: EEnviromentSolarIncidenceOptions | '';
+	heatSource: string;
+	rest: ERestOptions;
+	activities: EActivitiesOptions;
+	temperature?: string;
+	humidity?: string;
+	wind?: string;
+	startingTime: string;
+	endingTime: string;
+	totalTime: string;
+}
+
+export type THeatValuationPDFSections = {
+	[key: string]: Array<keyof IHeatForm>;
+};
+
+export const heatSections: THeatValuationPDFSections = {
+	header: ['company', 'date', 'sampleNumber', 'valuation', 'methodology'],
+	'Dados do Colaborador': ['name', 'function', 'sector', 'ghe', 'epi', 'epc'],
+	'Características dos Equipamentos de Trabalho': ['brand', 'model', 'serialNumber'],
+	'Dados da Amostragem': [
+		'climaticConditions',
+		'environment',
+		'ventilation',
+		'enviromentSolarIncidence',
+		'heatSource',
+		'rest',
+		'activities',
+		'temperature',
+		'humidity',
+		'wind',
+		'startingTime',
+		'endingTime',
+		'totalTime'
+	]
+};
+
+type THeatLabels = {
+	[key in keyof IHeatForm]: string;
+};
+
+export const heatLabels: Omit<THeatLabels, 'signatures' | 'type'> = {
+	company: 'Empresa',
+	date: 'Data',
+	sampleNumber: 'Número da Amostragem',
+	valuation: 'Avaliação',
+	methodology: 'Metodologia',
+	name: 'Nome',
+	function: 'Função',
+	sector: 'Setor',
+	ghe: 'GHE',
+	epi: 'EPI',
+	epc: 'epc',
+	brand: 'Marca',
+	model: 'Modelo',
+	serialNumber: 'Número de Série',
+	climaticConditions: 'Condições Climáticas',
+	environment: 'Ambiente',
+	ventilation: 'Ventilação',
+	enviromentSolarIncidence: 'Ambiente',
+	heatSource: 'Fonte de Calor',
+	rest: 'Descanso',
+	activities: 'Atividade',
+	temperature: 'Temperatura',
+	humidity: 'Umidade',
+	wind: 'Vento',
+	startingTime: 'Hora Inicial',
+	endingTime: 'Hora Final',
+	totalTime: 'Tempo total'
+};

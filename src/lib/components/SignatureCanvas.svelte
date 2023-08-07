@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { SignatureOwner } from '$lib/firebase/signatures';
 	import SignaturePad from 'signature_pad';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	export let holder: SignatureOwner;
 	export let value = '';
