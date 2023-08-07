@@ -116,7 +116,7 @@ export const heatLabels: Omit<THeatLabels, 'signatures' | 'type'> = {
 	sector: 'Setor',
 	ghe: 'GHE',
 	epi: 'EPI',
-	epc: 'epc',
+	epc: 'EPC',
 	brand: 'Marca',
 	model: 'Modelo',
 	serialNumber: 'Número de Série',
