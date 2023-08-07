@@ -2,6 +2,7 @@ import { heatLabels, heatSections, type IHeatForm } from '$lib/interfaces/forms/
 import jsPDF from 'jspdf';
 import encondedImage from '$lib/images/morelli_logo.json';
 import { EValuationTypesDisplayName } from '$lib/interfaces/forms/common';
+import { noiseLabels, noiseSections, type INoiseForm } from '$lib/interfaces/forms/noise';
 
 const logoWidth = 58;
 const logoHeight = 16;
@@ -9,7 +10,17 @@ const xMargin = 10;
 const yMargin = 10;
 const textGap = 1.75;
 
-export const generatePdf = (valuation: IHeatForm) => {
+const sections = {
+	heat: heatSections,
+	noise: noiseSections
+};
+
+const labels = {
+	heat: heatLabels,
+	noise: noiseLabels
+};
+
+export const generatePdf = (valuation: IHeatForm | INoiseForm) => {
 	const doc = new jsPDF();
 
 	const form = { ...valuation, date: valuation.date.toDate().toLocaleDateString('pt-BR') };
@@ -36,11 +47,13 @@ export const generatePdf = (valuation: IHeatForm) => {
 	const maxHeaderTextWidth = pageWidth - logoWidth - xMargin * 2;
 	const maxBodyTextWidth = pageWidth - xMargin * 2;
 
-	const headerFields = (heatSections['header'] as Array<keyof typeof form>).map((field) => {
-		const fieldValue = form[field] as string;
+	const headerFields = (sections[valuation.type]['header'] as Array<keyof typeof form>).map(
+		(field) => {
+			const fieldValue = form[field] as string;
 
-		return trimText(fieldValue, maxHeaderTextWidth);
-	});
+			return trimText(fieldValue, maxHeaderTextWidth);
+		}
+	);
 
 	headerFields.unshift(`Avaliação Quantitativa de ${EValuationTypesDisplayName[form.type]}`);
 
@@ -65,14 +78,14 @@ export const generatePdf = (valuation: IHeatForm) => {
 
 	let previousHeight = headerHeight;
 
-	Object.keys(heatSections).forEach((key) => {
-		const section = key as keyof typeof heatSections;
+	Object.keys(sections[valuation.type]).forEach((key) => {
+		const section = key as keyof (typeof sections)[valuation.type];
 
 		if (section === 'header') return;
 
 		fontSize === 10 && changeFontSize(15);
 
-		const fields = heatSections[section];
+		const fields = sections[valuation.type][section];
 		const sectionNameWidth = doc.getTextWidth(key);
 
 		doc.text(key, xMargin, previousHeight + lineHeight + sectionMarginTop);
@@ -90,7 +103,9 @@ export const generatePdf = (valuation: IHeatForm) => {
 
 		fields.forEach((field) => {
 			const fieldText = trimText(
-				`${heatLabels[field as keyof typeof heatLabels]}: ${String(form[field])}`,
+				`${labels[valuation.type][field as keyof (typeof labels)[valuation.type]]}: ${String(
+					form[field]
+				)}`,
 				maxBodyTextWidth
 			);
 			doc.text(fieldText, xMargin, previousHeight + lineHeight + fieldMarginTop);

@@ -47,9 +47,9 @@
 		><button class="btn btn-primary w-full">ruído</button></a
 	>
 	<a href="./nova-avaliacao/vibracao" class="w-full"
-		><button class="btn btn-primary w-full">vibração</button></a
+		><button class="btn btn-primary w-full btn-disabled">vibração</button></a
 	>
 	<a href="./nova-avaliacao/agentes-quimicos" class="w-full"
-		><button class="btn btn-primary w-full">agentes químicos</button></a
+		><button class="btn btn-primary w-full btn-disabled">agentes químicos</button></a
 	>
 </div>

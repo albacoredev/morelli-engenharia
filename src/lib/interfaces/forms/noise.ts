@@ -34,7 +34,7 @@ export type TNoiseValuationPDFSections = {
 	[key: string]: Array<keyof INoiseForm>;
 };
 
-export const heatSections: TNoiseValuationPDFSections = {
+export const noiseSections: TNoiseValuationPDFSections = {
 	header: ['company', 'date', 'sampleNumber'],
 	'Dados do Colaborador': ['name', 'function', 'sector', 'ghe', 'epi', 'epc'],
 	'Dados do Aparelho e Calibração': [
