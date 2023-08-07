@@ -2,9 +2,8 @@
 	import '../app.css';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { userStore, type UserStore, authHandlers } from '$lib/store';
+	import { userStore, type UserStore } from '$lib/store';
 	import Loading from '$lib/components/Loading.svelte';
-	import { uploadBase64Signature } from '$lib/firebase/signatures';
 
 	let currentUserStore: UserStore;
 	let loading: boolean;
