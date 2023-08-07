@@ -21,7 +21,6 @@
 	import SignatureCanvas from '$lib/components/SignatureCanvas.svelte';
 	import { SignatureOwner } from '$lib/firebase/signatures';
 	import { Timestamp } from 'firebase/firestore';
-	import { EValuationTypesDisplayName } from '$lib/interfaces/forms/common';
 
 	let currentUserStore: UserStore = {
 		user: null,
@@ -39,8 +38,16 @@
 
 	const form = {
 		type: 'heat',
-		signatures
-	} as IHeatForm;
+		signatures,
+		valuation: '',
+		methodology: '',
+		climaticConditions: '',
+		environment: '',
+		ventilation: '',
+		enviromentSolarIncidence: '',
+		rest: '',
+		activities: ''
+	} as unknown as IHeatForm;
 
 	let result = suite.get();
 
@@ -55,7 +62,7 @@
 			result = suite(form);
 
 			if (result.hasErrors()) {
-				const firstErrorInputName = Object.keys(result.getErrors())[0];
+				const firstErrorInputName = Object.keys(result.getErrors()).at(-1);
 				const element = document.querySelector(`input[name="${firstErrorInputName}"]`);
 
 				if (!element) return;
@@ -85,14 +92,21 @@
 		}
 	};
 
+	const updateDate = (date: string) => {
+		if (date === '') {
+			form.date = '' as unknown as Timestamp;
+			return;
+		}
+
+		form.date = new Timestamp(new Date(date).getTime() / 1000, 0);
+	};
+
 	$: form.totalTime = calculateTotalTime(form.startingTime, form.endingTime);
 	$: form.signatures = signatures;
-	$: form.date = new Timestamp(new Date(createdDate).getTime() / 1000, 0);
+	$: updateDate(createdDate);
 </script>
 
 <div class="flex flex-col items-center my-0 mx-auto justify-center">
-	<!-- <input id="myFileInput" type="file" accept="image/*;capture=camera" placeholder="photo" /> -->
-
 	<div class="navbar bg-base-100">
 		<div class="flex-none">
 			<a href="./home">

@@ -10,7 +10,6 @@
 	export let disabled = false;
 	export let autocomplete = 'off';
 	export let dataCyType = 'text';
-
 	export let result: SuiteResult | undefined = undefined;
 
 	$: error = result?.getErrors()[name]?.length ?? 0 > 0;
@@ -68,7 +67,9 @@
 
 	{#if result && result.getErrors()[name]}
 		<label class="label" for={name}>
-			<span class="label-text-alt text-error">{result.getErrors()[name][0]}</span>
+			<span data-cy="span-error-message" class="label-text-alt text-error"
+				>{result.getErrors()[name][0]}</span
+			>
 		</label>
 	{/if}
 </div>
