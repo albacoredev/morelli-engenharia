@@ -1,10 +1,11 @@
 import type IHeatValuationDoc from '$lib/interfaces/firebase/docs';
 import type { IHeatForm } from '$lib/interfaces/forms/heat';
+import type { INoiseForm } from '$lib/interfaces/forms/noise';
 import { userStore, type UserStore } from '$lib/store';
 import { addDoc, collection, FirestoreError, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from './firebase';
 
-export const addValuation = async (valuation: IHeatForm) => {
+export const addValuation = async (valuation: IHeatForm | INoiseForm) => {
 	let currentUserStore: UserStore = {
 		loading: true,
 		user: null

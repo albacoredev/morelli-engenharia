@@ -8,7 +8,7 @@ describe('Heat Valuation', () => {
 
 	it('Fills the entire form and saves the valuation on Firestore', () => {
 		cy.url().should('include', 'home');
-		cy.visit('/calor');
+		cy.visit('/nova-avaliacao/calor');
 		cy.intercept({
 			method: 'GET',
 			url: /.*localhost:8080.*/gm
@@ -35,7 +35,7 @@ describe('Heat Valuation', () => {
 			return notRequiredFields.includes(name) ? true : false;
 		};
 		cy.url().should('include', 'home');
-		cy.visit('/calor');
+		cy.visit('/nova-avaliacao/calor');
 		cy.intercept({
 			method: 'GET',
 			url: /.*localhost:8080.*/gm
