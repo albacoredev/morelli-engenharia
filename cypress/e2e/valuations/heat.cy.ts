@@ -58,7 +58,7 @@ describe('Heat Valuation', () => {
 	it('Fails to submit the form without filling any field', () => {
 		const requiredFields = 23;
 		cy.url().should('include', 'home');
-		cy.visit('/calor');
+		cy.visit('/nova-avaliacao/calor');
 		cy.intercept(
 			{
 				method: 'GET',

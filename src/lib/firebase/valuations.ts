@@ -4,8 +4,9 @@ import type { INoiseForm } from '$lib/interfaces/forms/noise';
 import { userStore, type UserStore } from '$lib/store';
 import { addDoc, collection, FirestoreError, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from './firebase';
+import type { IVibrationForm } from '$lib/interfaces/forms/vibration';
 
-export const addValuation = async (valuation: IHeatForm | INoiseForm) => {
+export const addValuation = async (valuation: IHeatForm | INoiseForm | IVibrationForm) => {
 	let currentUserStore: UserStore = {
 		loading: true,
 		user: null

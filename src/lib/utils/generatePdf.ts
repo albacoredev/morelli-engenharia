@@ -3,6 +3,7 @@ import jsPDF from 'jspdf';
 import encondedImage from '$lib/images/morelli_logo.json';
 import { EValuationTypesDisplayName } from '$lib/interfaces/forms/common';
 import { noiseLabels, noiseSections, type INoiseForm } from '$lib/interfaces/forms/noise';
+import { vibrationLabels, vibrationSections } from '$lib/interfaces/forms/vibration';
 
 const logoWidth = 58;
 const logoHeight = 16;
@@ -12,12 +13,14 @@ const textGap = 1.75;
 
 const sections = {
 	heat: heatSections,
-	noise: noiseSections
+	noise: noiseSections,
+	vibration: vibrationSections
 };
 
 const labels = {
 	heat: heatLabels,
-	noise: noiseLabels
+	noise: noiseLabels,
+	vibration: vibrationLabels
 };
 
 export const generatePdf = (valuation: IHeatForm | INoiseForm) => {

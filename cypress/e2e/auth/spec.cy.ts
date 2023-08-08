@@ -1,6 +1,12 @@
 describe('Protected Routes', () => {
 	it('Tries to access every protected route with no credentials', () => {
-		const protectedRoutes = ['/home', '/calor', '/avaliacoes'];
+		const protectedRoutes = [
+			'/home',
+			'nova-avaliacao/calor',
+			'nova-avaliacao/ruido',
+			'nova-avaliacao/vibracao',
+			'/avaliacoes'
+		];
 
 		protectedRoutes.forEach((route) => {
 			cy.visit(`${route}`);
