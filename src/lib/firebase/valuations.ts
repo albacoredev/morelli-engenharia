@@ -5,8 +5,11 @@ import { userStore, type UserStore } from '$lib/store';
 import { addDoc, collection, FirestoreError, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from './firebase';
 import type { IVibrationForm } from '$lib/interfaces/forms/vibration';
+import type { IChemicalAgentsForm } from '$lib/interfaces/forms/chemicalAgents';
 
-export const addValuation = async (valuation: IHeatForm | INoiseForm | IVibrationForm) => {
+export const addValuation = async (
+	valuation: IHeatForm | INoiseForm | IVibrationForm | IChemicalAgentsForm
+) => {
 	let currentUserStore: UserStore = {
 		loading: true,
 		user: null

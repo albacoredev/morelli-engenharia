@@ -49,7 +49,7 @@
 	<a href="./nova-avaliacao/vibracao" class="w-full"
 		><button class="btn btn-primary w-full">vibração</button></a
 	>
-	<a href="" class="w-full"
-		><button class="btn btn-primary w-full btn-disabled" disabled>agentes químicos</button></a
+	<a href="./nova-avaliacao/agentes-quimicos" class="w-full"
+		><button class="btn btn-primary w-full">agentes químicos</button></a
 	>
 </div>

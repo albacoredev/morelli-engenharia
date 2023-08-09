@@ -4,6 +4,7 @@ import encondedImage from '$lib/images/morelli_logo.json';
 import { EValuationTypesDisplayName } from '$lib/interfaces/forms/common';
 import { noiseLabels, noiseSections, type INoiseForm } from '$lib/interfaces/forms/noise';
 import { vibrationLabels, vibrationSections } from '$lib/interfaces/forms/vibration';
+import { chemicalAgentsLabels, chemicalAgentsSections } from '$lib/interfaces/forms/chemicalAgents';
 
 const logoWidth = 58;
 const logoHeight = 16;
@@ -14,13 +15,15 @@ const textGap = 1.75;
 const sections = {
 	heat: heatSections,
 	noise: noiseSections,
-	vibration: vibrationSections
+	vibration: vibrationSections,
+	chemicalAgents: chemicalAgentsSections
 };
 
 const labels = {
 	heat: heatLabels,
 	noise: noiseLabels,
-	vibration: vibrationLabels
+	vibration: vibrationLabels,
+	chemicalAgents: chemicalAgentsLabels
 };
 
 export const generatePdf = (valuation: IHeatForm | INoiseForm) => {

@@ -6,6 +6,7 @@ import { addValuation, readValuations } from './firebase/valuations';
 import type { IHeatForm } from './interfaces/forms/heat';
 import type { INoiseForm } from './interfaces/forms/noise';
 import type { IVibrationForm } from './interfaces/forms/vibration';
+import type { IChemicalAgentsForm } from './interfaces/forms/chemicalAgents';
 
 export interface UserStore {
 	user: User | null;
@@ -44,7 +45,8 @@ export const authHandlers = {
 };
 
 export const valuationsHandlers = {
-	add: async (form: IHeatForm | INoiseForm | IVibrationForm) => await addValuation(form),
+	add: async (form: IHeatForm | INoiseForm | IVibrationForm | IChemicalAgentsForm) =>
+		await addValuation(form),
 	read: async (uid: string) => await readValuations(uid)
 };
 
