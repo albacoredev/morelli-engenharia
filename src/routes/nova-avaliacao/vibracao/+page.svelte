@@ -9,7 +9,15 @@
 	import suite from '$lib/vestSuites/vibration';
 	import Input from '$lib/components/Input.svelte';
 	import SignatureCanvas from '$lib/components/SignatureCanvas.svelte';
-	import { vibrationLabels, type IVibrationForm } from '$lib/interfaces/forms/vibration';
+	import {
+		vibrationLabels,
+		type IVibrationForm,
+		EConservationOptions,
+		EPhysicalStressOptions,
+		EWorkerPostureOptions,
+		ERoutineActivityOptions
+	} from '$lib/interfaces/forms/vibration';
+	import Radio from '$lib/components/Radio.svelte';
 
 	let currentUserStore: UserStore = {
 		user: null,
@@ -27,7 +35,11 @@
 
 	const form = {
 		type: 'vibration',
-		signatures
+		signatures,
+		conservation: '',
+		physicalStress: '',
+		workerPosture: '',
+		routineActivity: ''
 	} as unknown as IVibrationForm;
 
 	let result = suite.get();
@@ -157,11 +169,12 @@
 			name="manufacturer"
 		/>
 		<Input placeholder={vibrationLabels.year} bind:value={form.year} bind:result name="year" />
-		<Input
-			placeholder={vibrationLabels.conservation}
-			bind:value={form.conservation}
-			bind:result
+		<Radio
+			options={Object.values(EConservationOptions)}
 			name="conservation"
+			label={vibrationLabels.conservation}
+			bind:result
+			bind:selected={form.conservation}
 		/>
 		<Input
 			placeholder={vibrationLabels.avgSpeed}
@@ -222,17 +235,19 @@
 			name="totalTime"
 			disabled
 		/>
-		<Input
-			placeholder={vibrationLabels.physicalStress}
-			bind:value={form.physicalStress}
-			bind:result
+		<Radio
+			options={Object.values(EPhysicalStressOptions)}
 			name="physicalStress"
-		/>
-		<Input
-			placeholder={vibrationLabels.workerPosture}
-			bind:value={form.workerPosture}
+			label={vibrationLabels.physicalStress}
 			bind:result
+			bind:selected={form.physicalStress}
+		/>
+		<Radio
+			options={Object.values(EWorkerPostureOptions)}
 			name="workerPosture"
+			label={vibrationLabels.workerPosture}
+			bind:result
+			bind:selected={form.workerPosture}
 		/>
 		<Input
 			placeholder={vibrationLabels.surfaceType}
@@ -246,11 +261,12 @@
 			bind:result
 			name="aggravatingCondition"
 		/>
-		<Input
-			placeholder={vibrationLabels.routineActivity}
-			bind:value={form.routineActivity}
-			bind:result
+		<Radio
+			options={Object.values(ERoutineActivityOptions)}
 			name="routineActivity"
+			label={vibrationLabels.routineActivity}
+			bind:result
+			bind:selected={form.routineActivity}
 		/>
 		<Input
 			placeholder={vibrationLabels.estimatedExposureTime}

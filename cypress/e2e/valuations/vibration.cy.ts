@@ -19,6 +19,7 @@ describe('Vibration Valuation', () => {
 		cy.get('[data-cy*="input"][data-cy-type="time"]').each((el, i) =>
 			cy.wrap(el).type(`${14 + i}:00:00`)
 		);
+		cy.get('[data-cy*="radio"]').each((el) => cy.wrap(el).click());
 		cy.get('[data-cy="button-submit"]').each((el) => cy.wrap(el).click());
 
 		cy.wait('@firestore');
