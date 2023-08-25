@@ -201,7 +201,7 @@
 						>
 						<td
 							><a href="avaliacoes/{row.id}"
-								><button class="btn btn-primary btn-outline btn-sm">editar</button></a
+								><button class="btn btn-primary btn-outline btn-sm">horário</button></a
 							></td
 						>
 					</tr>
