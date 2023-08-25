@@ -171,6 +171,7 @@
 				<th>Criado</th>
 				<th />
 				<th />
+				<th />
 			</tr>
 		</thead>
 		<tbody>
@@ -196,6 +197,11 @@
 								on:click={() => {
 									openPhotosDialog(row.id);
 								}}>fotos</button
+							></td
+						>
+						<td
+							><a href="avaliacoes/{row.id}"
+								><button class="btn btn-primary btn-outline btn-sm">horário</button></a
 							></td
 						>
 					</tr>
