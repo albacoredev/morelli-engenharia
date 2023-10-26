@@ -24,12 +24,19 @@
 	} else {
 		greeting = 'Boa noite';
 	}
+
+	const signout = async () => {
+		const { auth } = await import('$lib/firebase/firebase');
+
+		auth.signOut();
+	};
 </script>
 
 <div
 	class="flex flex-col items-center my-0 mx-auto justify-center gap-8 box-border py-16 w-3/4 md:w-2/4 lg:w-1/4"
 >
 	<span class="text-base-content font-bold normal-case text-xl">{greeting}, {userDisplayName}</span>
+	<button class="btn btn-primary btn-sm" on:click={signout}>sair</button>
 
 	<div class="divider py-4">
 		<span class="text-lg text-secondary font-bold">Avaliações Quantitativas</span>

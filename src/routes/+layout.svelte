@@ -25,7 +25,7 @@
 			if (user) {
 				if (currentPath == '/') await goto('/home');
 			} else if (!nonAuthRoutes.includes(currentPath)) {
-				await goto('/');
+				window.location.replace('/');
 			}
 
 			userStore.update((curr) => ({ ...curr, loading: false }));
