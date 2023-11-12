@@ -4,6 +4,7 @@
 	import Input from '$lib/components/Input.svelte';
 	import { changeTime } from '$lib/firebase/changeTime';
 	import type { IChangeTimeForm } from '$lib/interfaces/forms/changeTime';
+	import { valuationStore } from '$lib/store';
 	import getTotalTime from '$lib/utils/getTotalTime';
 	import suite from '$lib/vestSuites/changeTime';
 
@@ -14,6 +15,10 @@
 	const valuationId = $page.url.href.split('/').at(-1);
 
 	let loading = false;
+
+	$: currentValuationStore = $valuationStore.userValuations;
+
+	const formData = currentValuationStore.filter((v) => v.id == valuationId)[0].data;
 
 	const handleSubmit = async () => {
 		result = suite(form);
@@ -36,8 +41,6 @@
 
 	$: form.totalTime = calculateTotalTime(form.startingTime, form.endingTime);
 </script>
-
-<h1>{valuationId}</h1>
 
 <div class="flex flex-col items-center my-0 mx-auto justify-center">
 	<div class="navbar bg-base-100">

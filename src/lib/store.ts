@@ -2,11 +2,12 @@ import { signInWithEmailAndPassword, signOut, type User } from 'firebase/auth';
 import { writable } from 'svelte/store';
 import { auth } from './firebase/firebase';
 import { deletePhoto, downloadPhotos } from './firebase/photos';
-import { addValuation, readValuations } from './firebase/valuations';
+import { addValuation, readValuations, updateValuations } from './firebase/valuations';
 import type { IHeatForm } from './interfaces/forms/heat';
 import type { INoiseForm } from './interfaces/forms/noise';
 import type { IVibrationForm } from './interfaces/forms/vibration';
 import type { IChemicalAgentsForm } from './interfaces/forms/chemicalAgents';
+import type IHeatValuationDoc from './interfaces/firebase/docs';
 
 export interface UserStore {
 	user: User | null;
@@ -15,6 +16,7 @@ export interface UserStore {
 
 export interface ValuationStore {
 	loading: boolean;
+	userValuations: IHeatValuationDoc[];
 }
 
 export interface PhotosStore {
@@ -35,7 +37,8 @@ export const photosStore = writable<PhotosStore>({
 });
 
 export const valuationStore = writable<ValuationStore>({
-	loading: true
+	loading: true,
+	userValuations: []
 });
 
 export const authHandlers = {
@@ -47,7 +50,9 @@ export const authHandlers = {
 export const valuationsHandlers = {
 	add: async (form: IHeatForm | INoiseForm | IVibrationForm | IChemicalAgentsForm) =>
 		await addValuation(form),
-	read: async (uid: string) => await readValuations(uid)
+	read: async (uid: string) => await readValuations(uid),
+	update: async (userId: string, valuationId: string, form: object) =>
+		await updateValuations(userId, valuationId, form)
 };
 
 export const photosHandlers = {

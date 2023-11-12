@@ -125,9 +125,9 @@ export const generatePdf = (valuation: IHeatForm | INoiseForm) => {
 		doc.addImage({
 			imageData: evaluatorSignature,
 			x: xMargin,
-			y: pageHeight - 44 - lineHeight,
-			width: 80,
-			height: 30
+			y: pageHeight - lineHeight * 2 - 15,
+			width: 40,
+			height: 15
 		});
 	}
 
@@ -140,10 +140,10 @@ export const generatePdf = (valuation: IHeatForm | INoiseForm) => {
 	if (evaluatedSignature != '') {
 		doc.addImage({
 			imageData: evaluatedSignature,
-			x: pageWidth - xMargin - 80,
-			y: pageHeight - 44 - lineHeight,
-			width: 80,
-			height: 30
+			x: pageWidth - xMargin - 40,
+			y: pageHeight - lineHeight * 2 - 15,
+			width: 40,
+			height: 15
 		});
 	}
 

@@ -2,7 +2,7 @@
 	import Loading from '$lib/components/Loading.svelte';
 	import PhotoItem from '$lib/components/PhotoItem.svelte';
 	import { downloadPhotos, uploadPhoto } from '$lib/firebase/photos';
-	import { EValuationTypesDisplayName } from '$lib/interfaces/forms/common';
+	import { EValuationTypesDisplayName, EValuationsRoutes } from '$lib/interfaces/forms/common';
 	import type { IHeatForm } from '$lib/interfaces/forms/heat';
 	import {
 		userStore,
@@ -10,7 +10,9 @@
 		type UserStore,
 		photosHandlers,
 		photosStore,
-		type PhotosStore
+		type PhotosStore,
+		type ValuationStore,
+		valuationStore
 	} from '$lib/store';
 	import { generatePdf } from '$lib/utils/generatePdf';
 	import { onMount } from 'svelte';
@@ -28,7 +30,13 @@
 		loading: false
 	};
 
+	let currentValuationStore: ValuationStore = {
+		loading: false,
+		userValuations: []
+	};
+
 	userStore.subscribe((store) => (currentUserStore = store));
+	valuationStore.subscribe((store) => (currentValuationStore = store));
 
 	let currentPhotosStore: PhotosStore = {
 		photosUrls: undefined,
@@ -200,8 +208,8 @@
 							></td
 						>
 						<td
-							><a href="avaliacoes/{row.id}"
-								><button class="btn btn-primary btn-outline btn-sm">horário</button></a
+							><a href="avaliacoes/{row.id}/{EValuationsRoutes[row.type]}"
+								><button class="btn btn-primary btn-outline btn-sm">editar</button></a
 							></td
 						>
 					</tr>
