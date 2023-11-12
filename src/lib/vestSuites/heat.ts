@@ -5,7 +5,7 @@ import { create, test, enforce } from 'vest';
 const notRequiredFields = ['temperature', 'humidity', 'wind', 'type', 'signatures'];
 
 const suite = create((data: IHeatForm) => {
-	Object.keys(data).forEach((field) => {
+	['company', 'date'].forEach((field) => {
 		if (notRequiredFields.includes(field)) return;
 
 		test(field, 'Campo obrigatório', () => {

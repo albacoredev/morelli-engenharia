@@ -3,7 +3,7 @@ import hmsToSeconds from '$lib/utils/hmsToSeconds';
 import { create, test, enforce } from 'vest';
 
 const suite = create((data: INoiseForm) => {
-	Object.keys(data).forEach((field) => {
+	['company', 'date'].forEach((field) => {
 		test(field, 'Campo obrigatório', () => {
 			enforce(data[field as keyof typeof data]).isNotEmpty();
 		});

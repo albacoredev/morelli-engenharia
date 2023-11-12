@@ -4,3 +4,10 @@ export enum EValuationTypesDisplayName {
 	vibration = 'Vibração',
 	chemicalAgents = 'Agentes Químicos'
 }
+
+export enum EValuationsRoutes {
+	heat = 'calor',
+	noise = 'ruido',
+	vibration = 'vibracao',
+	chemicalAgents = 'agentes-quimicos'
+}
