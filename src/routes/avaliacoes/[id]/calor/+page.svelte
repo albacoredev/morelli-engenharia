@@ -74,7 +74,7 @@
 
 			const { valuationsHandlers } = await import('$lib/store');
 
-			await valuationsHandlers.add(form);
+			await valuationsHandlers.update(currentUserStore.user.uid, valuationId ?? '', form);
 
 			await goto('../');
 		}
