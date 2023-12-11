@@ -9,6 +9,7 @@
 	import { onDestroy } from 'svelte';
 	import suite from '$lib/vestSuites/noise';
 	import Input from '$lib/components/Input.svelte';
+	import Radio from '$lib/components/Radio.svelte';
 	import SignatureCanvas from '$lib/components/SignatureCanvas.svelte';
 	import { page } from '$app/stores';
 

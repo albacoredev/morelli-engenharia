@@ -94,6 +94,15 @@
 		form.date = new Timestamp(new Date(date).getTime() / 1000, 0);
 	};
 
+	const equipmentOptions = ['Usar Aparelho da Lista', 'Inserir Aparelho Manualmente'];
+	let equipmentList: (typeof equipmentOptions)[number] = equipmentOptions[0];
+	const resetEquipment = (_: any) => {
+		form.brand = '';
+		form.model = '';
+		form.serialNumber = '';
+	};
+
+	$: resetEquipment(equipmentList);
 	$: form.totalTime = calculateTotalTime(form.startingTime, form.endingTime);
 	$: form.signatures = signatures;
 	$: updateDate(createdDate);
@@ -199,13 +208,77 @@
 			<span class="text-lg text-secondary font-bold">Dados do Aparelho de Medição</span>
 		</div>
 
-		<Input placeholder={vibrationLabels.brand} bind:value={form.brand} bind:result name="brand" />
-		<Input placeholder={vibrationLabels.model} bind:value={form.model} bind:result name="model" />
+		<Radio
+			options={equipmentOptions}
+			name="equipmentList"
+			label="Aparelho"
+			bind:result
+			bind:selected={equipmentList}
+		/>
+
+		<div class="form-control w-full py-2">
+			<label class="label" for="equipmentBrands">
+				<span class="label-text">Selecione a Marca do Aparelho</span>
+			</label>
+			<select
+				class="select select-bordered select-primary w-full"
+				disabled={equipmentList == equipmentOptions[1]}
+				name="equipmentBrands"
+				bind:value={form.brand}
+			>
+				<option disabled selected>Selecionar</option>
+				<option>CHROMPACK</option>
+			</select>
+		</div>
+		<div class="form-control w-full py-2">
+			<label class="label" for="equipmentBrands">
+				<span class="label-text">Selecione o Modelo do Aparelho</span>
+			</label>
+			<select
+				class="select select-bordered select-primary w-full"
+				disabled={equipmentList == equipmentOptions[1]}
+				name="equipmentBrands"
+				bind:value={form.model}
+			>
+				<option disabled selected>Selecionar</option>
+				<option>SmartVib</option>
+			</select>
+		</div>
+		<div class="form-control w-full py-2">
+			<label class="label" for="equipmentBrands">
+				<span class="label-text">Selecione o Número de Série</span>
+			</label>
+			<select
+				class="select select-bordered select-primary w-full"
+				disabled={equipmentList == equipmentOptions[1]}
+				name="equipmentBrands"
+				bind:value={form.serialNumber}
+			>
+				<option disabled selected>Selecionar</option>
+				<option>734</option>
+			</select>
+		</div>
+
+		<Input
+			placeholder={vibrationLabels.brand}
+			bind:value={form.brand}
+			bind:result
+			name="brand"
+			disabled={equipmentList == equipmentOptions[0]}
+		/>
+		<Input
+			placeholder={vibrationLabels.model}
+			bind:value={form.model}
+			bind:result
+			name="model"
+			disabled={equipmentList == equipmentOptions[0]}
+		/>
 		<Input
 			placeholder={vibrationLabels.serialNumber}
 			bind:value={form.serialNumber}
 			bind:result
 			name="serialNumber"
+			disabled={equipmentList == equipmentOptions[0]}
 		/>
 
 		<div class="divider py-4">
