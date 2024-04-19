@@ -12,8 +12,7 @@ declare global {
 declare global {
 	interface Window {
 		photoModal: HTMLDialogElement;
-		cameraModal: HTMLDialogElement;
-		photoViewModal: HTMLDialogElement;
+		uploadPhoto: HTMLDialogElement;
 	}
 }
 

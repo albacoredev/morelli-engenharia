@@ -35,21 +35,76 @@
 		userValuations: []
 	};
 
-	userStore.subscribe((store) => (currentUserStore = store));
-	valuationStore.subscribe((store) => (currentValuationStore = store));
-
 	let currentPhotosStore: PhotosStore = {
 		photosUrls: undefined,
 		loading: true,
 		valuationId: ''
 	};
 
+	userStore.subscribe((store) => (currentUserStore = store));
+	valuationStore.subscribe((store) => (currentValuationStore = store));
 	photosStore.subscribe((store) => (currentPhotosStore = store));
 
 	let rows: ITableRow[] = [];
 	let valuationsLoading = true;
-
 	let userDisplayName = currentUserStore?.user?.email?.split('@')[0] ?? '';
+	let currentValuation: string | undefined = undefined;
+	let image: HTMLImageElement;
+	let input: HTMLInputElement;
+
+	const downloadPDF = (form: IHeatForm) => {
+		const url = generatePdf(form);
+
+		window.open(url, '_blank');
+	};
+
+	const openPhotosDialog = (valuationId: string) => {
+		currentValuation = valuationId;
+		window.photoModal.showModal();
+		downloadPhotos(valuationId);
+	};
+
+	const getPhotosUrls = (valuationId: string) => {
+		if (!valuationId) return;
+
+		photosHandlers.read(valuationId);
+	};
+
+	const onSelectImage = () => {
+		const file = input.files?.[0];
+
+		if (!file) return;
+
+		if (file) {
+			const reader = new FileReader();
+			reader.addEventListener('load', () => {
+				image.setAttribute('src', `${reader.result}`);
+			});
+			reader.readAsDataURL(file);
+
+			return;
+		}
+	};
+
+	const uploadSelectedImage = () => {
+		resetImg();
+
+		let file = input.files?.[0];
+
+		if (!file) return;
+
+		const reader = new FileReader();
+		reader.addEventListener('load', () => {
+			if (!currentValuation || !reader.result) return;
+
+			uploadPhoto(`${reader.result}`.split(',')[1], currentValuation);
+		});
+		reader.readAsDataURL(file);
+	};
+
+	const resetImg = () => {
+		image.setAttribute('src', '#');
+	};
 
 	onMount(async () => {
 		if (!currentUserStore.user) return;
@@ -67,75 +122,6 @@
 			};
 		});
 	});
-
-	const downloadPDF = (form: IHeatForm) => {
-		const url = generatePdf(form);
-
-		window.open(url, '_blank');
-	};
-
-	let currentValuation: string | undefined = undefined;
-	let videoElement: HTMLVideoElement;
-	let canvasElement: HTMLCanvasElement;
-	let stream: MediaStream;
-	let imageDataUrl = '';
-
-	const openPhotosDialog = (valuationId: string) => {
-		currentValuation = valuationId;
-		window.photoModal.showModal();
-		downloadPhotos(valuationId);
-	};
-
-	const startCamera = async () => {
-		window.cameraModal.showModal();
-
-		const defaultConstraints: MediaStreamConstraints = {
-			video: true,
-			audio: false
-		};
-
-		const mobileConstraints: MediaStreamConstraints = {
-			video: {
-				facingMode: {
-					exact: 'environment'
-				}
-			},
-			audio: false
-		};
-
-		try {
-			stream = await navigator.mediaDevices.getUserMedia(mobileConstraints);
-		} catch (error) {
-			stream = await navigator.mediaDevices.getUserMedia(defaultConstraints);
-		}
-
-		videoElement.srcObject = stream;
-	};
-
-	const viewPhoto = () => {
-		window.photoViewModal.showModal();
-
-		canvasElement.width = stream.getTracks()[0].getSettings().width ?? 0;
-		canvasElement.height = stream.getTracks()[0].getSettings().height ?? 0;
-
-		canvasElement
-			.getContext('2d')
-			?.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-
-		imageDataUrl = canvasElement.toDataURL('image/jpeg');
-	};
-
-	const uploadTakenPhoto = (id: string | undefined) => {
-		if (!currentValuation) return;
-
-		uploadPhoto(imageDataUrl.split(',')[1], id as string);
-	};
-
-	const getPhotosUrls = (valuationId: string) => {
-		if (!valuationId) return;
-
-		photosHandlers.read(valuationId);
-	};
 
 	$: currentValuation && getPhotosUrls(currentValuation);
 </script>
@@ -211,7 +197,7 @@
 	</tbody>
 </table>
 
-<dialog id="photoModal" class="bg-transparent">
+<dialog id="photoModal" class="bg-transparent w-screen">
 	<form method="dialog" class="bg-base-100 p-4 rounded-lg">
 		{#if currentPhotosStore.photosUrls && !currentPhotosStore.loading}
 			<div class="flex gap-2 mb-4">
@@ -220,7 +206,13 @@
 						<button type="button" class="btn btn-primary btn-disabled"> adcionar fotos </button>
 					</div>
 				{:else}
-					<button class="btn btn-primary" on:click={startCamera}>tirar foto</button>
+					<button
+						class="btn btn-primary"
+						on:click={() => {
+							input.value = '';
+							window.uploadPhoto.showModal();
+						}}>escolher foto</button
+					>
 				{/if}
 			</div>
 			<div class="flex flex-col gap-8">
@@ -241,44 +233,22 @@
 	</form>
 </dialog>
 
-<dialog id="cameraModal" class="bg-transparent">
+<dialog id="uploadPhoto" class="bg-transparent w-screen">
 	<form method="dialog" class="bg-base-100 p-4 rounded-lg">
-		<video id="video" autoplay bind:this={videoElement} />
-		<div class="modal-action">
-			<button class="btn btn-primary" on:click={viewPhoto}
-				><svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke-width="1.5"
-					stroke="currentColor"
-					class="w-6 h-6"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"
-					/>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"
-					/>
-				</svg>
-			</button>
-			<button class="btn btn-primary">fechar</button>
-		</div>
-	</form>
-</dialog>
-
-<dialog id="photoViewModal" class="bg-transparent">
-	<form method="dialog" class="bg-base-100 p-4 rounded-lg">
-		<canvas bind:this={canvasElement} />
-		<div class="modal-action">
-			<button class="btn btn-primary" on:click={() => uploadTakenPhoto(currentValuation)}
-				>salvar</button
-			>
-			<button class="btn btn-primary">fechar</button>
+		<label for="photo-input" class="btn btn-primary">Selecionar Imagem</label>
+		<input
+			id="photo-input"
+			type="file"
+			name="photo-input"
+			accept="image/png, image/jpeg"
+			class="invisible h-0"
+			bind:this={input}
+			on:change={onSelectImage}
+		/>
+		<img bind:this={image} src="#" alt="Selecione um arquivo" class="w-1/2" />
+		<div class="w-100 flex justify-between pt-8">
+			<button class="btn btn-primary" on:click={uploadSelectedImage}>enviar</button>
+			<button class="btn btn-outline" on:click={resetImg}>cancelar</button>
 		</div>
 	</form>
 </dialog>
