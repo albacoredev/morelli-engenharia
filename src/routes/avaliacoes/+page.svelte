@@ -170,54 +170,46 @@
 	</div>
 </div>
 
-<div class="overflow-x-auto">
-	<table class="table w-full">
-		<thead>
-			<tr>
-				<th>Tipo</th>
-				<th>Empresa</th>
-				<th>Criado</th>
-				<th />
-				<th />
-				<th />
-			</tr>
-		</thead>
-		<tbody>
-			{#if valuationsLoading}
-				<Loading />
-			{:else}
-				{#each rows as row}
-					<tr>
-						<td>{EValuationTypesDisplayName[row.type]}</td>
-						<td>{row.company}</td>
-						<td>{row.createdAt}</td>
-						<td
-							><button
-								class="btn btn-primary btn-sm"
-								on:click={() => {
-									downloadPDF(row.formData);
-								}}>PDF</button
-							></td
-						>
-						<td
-							><button
-								class="btn btn-sm btn-primary"
-								on:click={() => {
-									openPhotosDialog(row.id);
-								}}>fotos</button
-							></td
-						>
-						<td
-							><a href="avaliacoes/{row.id}/{EValuationsRoutes[row.type]}"
-								><button class="btn btn-primary btn-outline btn-sm">editar</button></a
-							></td
-						>
-					</tr>
-				{/each}
-			{/if}
-		</tbody>
-	</table>
-</div>
+<table class="table-fixed w-full">
+	<thead>
+		<tr>
+			<th>Tipo</th>
+			<th>Empresa</th>
+			<th>Criado</th>
+		</tr>
+	</thead>
+	<tbody>
+		{#if valuationsLoading}
+			<Loading />
+		{:else}
+			{#each rows as row}
+				<tr class="border-solid border-t-2 border-secondary">
+					<td class="border-0">{EValuationTypesDisplayName[row.type]}</td>
+					<td class="border-0">{row.company}</td>
+					<td class="border-0">{row.createdAt}</td>
+				</tr>
+				<div class="inline-flex p-2 gap-2">
+					<button
+						class="btn btn-primary btn-sm"
+						on:click={() => {
+							downloadPDF(row.formData);
+						}}>PDF</button
+					>
+					<button
+						class="btn btn-sm btn-primary"
+						on:click={() => {
+							openPhotosDialog(row.id);
+						}}>fotos</button
+					>
+
+					<a href="avaliacoes/{row.id}/{EValuationsRoutes[row.type]}"
+						><button class="btn btn-primary btn-outline btn-sm">editar</button></a
+					>
+				</div>
+			{/each}
+		{/if}
+	</tbody>
+</table>
 
 <dialog id="photoModal" class="bg-transparent">
 	<form method="dialog" class="bg-base-100 p-4 rounded-lg">
