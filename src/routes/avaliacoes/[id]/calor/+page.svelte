@@ -105,7 +105,7 @@
 <div class="flex flex-col items-center my-0 mx-auto justify-center">
 	<div class="navbar bg-base-100">
 		<div class="flex-none">
-			<a href="../home">
+			<a href="../">
 				<button class="btn btn-square btn-ghost">
 					<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
 						><g id="SVGRepo_bgCarrier" stroke-width="0" /><g
@@ -174,6 +174,13 @@
 		<Input placeholder={'GHE'} bind:value={form.ghe} bind:result name="ghe" />
 		<Input placeholder={'EPI'} bind:value={form.epi} bind:result name="epi" type="textArea" />
 		<Input placeholder={'EPC'} bind:value={form.epc} bind:result name="epc" type="textArea" />
+		<Input
+			placeholder={'Descrição das Atividades'}
+			bind:value={form.activitiesDescription}
+			bind:result
+			name="activitiesDescription"
+			type="textArea"
+		/>
 
 		<div class="divider py-4">
 			<span class="text-lg text-secondary font-bold"

@@ -102,7 +102,7 @@
 <div class="flex flex-col items-center my-0 mx-auto justify-center">
 	<div class="navbar bg-base-100">
 		<div class="flex-none">
-			<a href="../../avaliacoes">
+			<a href="../">
 				<button class="btn btn-square btn-ghost">
 					<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
 						><g id="SVGRepo_bgCarrier" stroke-width="0" /><g

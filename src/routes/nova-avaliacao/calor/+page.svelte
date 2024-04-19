@@ -178,6 +178,13 @@
 		<Input placeholder={'GHE'} bind:value={form.ghe} bind:result name="ghe" />
 		<Input placeholder={'EPI'} bind:value={form.epi} bind:result name="epi" type="textArea" />
 		<Input placeholder={'EPC'} bind:value={form.epc} bind:result name="epc" type="textArea" />
+		<Input
+			placeholder={'Descrição das Atividades'}
+			bind:value={form.activitiesDescription}
+			bind:result
+			name="activitiesDescription"
+			type="textArea"
+		/>
 
 		<div class="divider py-4">
 			<span class="text-lg text-secondary font-bold"

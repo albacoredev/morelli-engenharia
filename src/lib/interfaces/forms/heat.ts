@@ -58,6 +58,7 @@ export interface IHeatForm {
 	ghe: string;
 	epi: string;
 	epc: string;
+	activitiesDescription: string;
 	brand: string;
 	model: string;
 	serialNumber: string;
@@ -82,7 +83,15 @@ export type THeatValuationPDFSections = {
 
 export const heatSections: THeatValuationPDFSections = {
 	header: ['company', 'date', 'sampleNumber', 'valuation', 'methodology'],
-	'Dados do Colaborador': ['name', 'function', 'sector', 'ghe', 'epi', 'epc'],
+	'Dados do Colaborador': [
+		'name',
+		'function',
+		'sector',
+		'ghe',
+		'epi',
+		'epc',
+		'activitiesDescription'
+	],
 	'Características dos Equipamentos de Trabalho': ['brand', 'model', 'serialNumber'],
 	'Dados da Amostragem': [
 		'climaticConditions',
@@ -117,6 +126,7 @@ export const heatLabels: Omit<THeatLabels, 'signatures' | 'type'> = {
 	ghe: 'GHE',
 	epi: 'EPI',
 	epc: 'EPC',
+	activitiesDescription: 'Descrição das Atividades',
 	brand: 'Marca',
 	model: 'Modelo',
 	serialNumber: 'Número de Série',
