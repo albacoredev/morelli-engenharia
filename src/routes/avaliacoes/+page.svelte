@@ -53,7 +53,12 @@
 	let input: HTMLInputElement;
 
 	const downloadPDF = (form: IHeatForm) => {
-		const url = generatePdf(form);
+		const emailSplit = currentUserStore?.user?.email?.split('@')[0].split('.') ?? ['', ''];
+		const firstName = emailSplit[0].charAt(0).toUpperCase() + emailSplit[0].slice(1);
+		const lastName = emailSplit[1].charAt(0).toUpperCase() + emailSplit[1].slice(1);
+		const technitiansName = `${firstName} ${lastName}`;
+
+		const url = generatePdf(form, technitiansName);
 
 		window.open(url, '_blank');
 	};

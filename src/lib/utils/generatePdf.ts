@@ -26,7 +26,7 @@ const labels = {
 	chemicalAgents: chemicalAgentsLabels
 };
 
-export const generatePdf = (valuation: IHeatForm | INoiseForm) => {
+export const generatePdf = (valuation: IHeatForm | INoiseForm, techniciansName: string) => {
 	const doc = new jsPDF();
 
 	const form = { ...valuation, date: valuation.date.toDate().toLocaleDateString('pt-BR') };
@@ -125,11 +125,17 @@ export const generatePdf = (valuation: IHeatForm | INoiseForm) => {
 		doc.addImage({
 			imageData: evaluatorSignature,
 			x: xMargin,
-			y: pageHeight - lineHeight * 2 - 15,
+			y: pageHeight - lineHeight * 3 - 15,
 			width: 40,
 			height: 15
 		});
 	}
+
+	doc.text(
+		techniciansName,
+		(80 - doc.getTextWidth('Responsável Técnico avaliador')) / 2 + xMargin,
+		pageHeight - lineHeight * 2
+	);
 
 	doc.text(
 		'Responsável Técnico avaliador',
@@ -141,11 +147,17 @@ export const generatePdf = (valuation: IHeatForm | INoiseForm) => {
 		doc.addImage({
 			imageData: evaluatedSignature,
 			x: pageWidth - xMargin - 40,
-			y: pageHeight - lineHeight * 2 - 15,
+			y: pageHeight - lineHeight * 3 - 15,
 			width: 40,
 			height: 15
 		});
 	}
+
+	doc.text(
+		valuation.name,
+		pageWidth - xMargin - 80 + (80 - doc.getTextWidth('Colaborador Avaliado')) / 2,
+		pageHeight - lineHeight * 2
+	);
 
 	doc.text(
 		'Colaborador Avaliado',
