@@ -82,7 +82,7 @@ export type THeatValuationPDFSections = {
 };
 
 export const heatSections: THeatValuationPDFSections = {
-	header: ['company', 'date', 'sampleNumber', 'valuation', 'methodology'],
+	header: ['company', 'date', 'valuation', 'methodology'],
 	'Dados do Colaborador': [
 		'name',
 		'function',

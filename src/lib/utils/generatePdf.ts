@@ -62,13 +62,16 @@ export const generatePdf = (valuation: IHeatForm | INoiseForm, techniciansName: 
 	);
 
 	headerFields.unshift(`Avaliação Quantitativa de ${EValuationTypesDisplayName[form.type]}`);
+	headerFields.push(`Número de Amostragem: ${valuation.sampleNumber}`);
 
 	doc.setFillColor(214, 211, 209);
 	doc.rect(0, 0, pageWidth, headerHeight, 'F');
 
-	headerFields.forEach((field, index) => {
-		doc.text(field, xMargin, yMargin + (lineHeight + textGap) * index);
-	});
+	headerFields
+		.filter((field) => field !== '')
+		.forEach((field, index) => {
+			doc.text(field, xMargin, yMargin + (lineHeight + textGap) * index);
+		});
 
 	doc.addImage({
 		imageData: encondedImage.base64,

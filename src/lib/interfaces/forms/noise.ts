@@ -35,7 +35,7 @@ export type TNoiseValuationPDFSections = {
 };
 
 export const noiseSections: TNoiseValuationPDFSections = {
-	header: ['company', 'date', 'sampleNumber'],
+	header: ['company', 'date'],
 	'Dados do Colaborador': ['name', 'function', 'sector', 'ghe', 'epi', 'epc'],
 	'Dados do Aparelho e Calibração': [
 		'deviceBrand',

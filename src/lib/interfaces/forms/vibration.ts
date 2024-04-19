@@ -59,7 +59,7 @@ export type TVibrationValuationPDFSections = {
 };
 
 export const vibrationSections: TVibrationValuationPDFSections = {
-	header: ['company', 'date', 'sampleNumber'],
+	header: ['company', 'date'],
 	'Dados do Colaborador': ['name', 'function', 'sector', 'ghe'],
 	'Características das Máquinas/Veículos/Ferramentas/Equipamentos de Trabalho': [
 		'manufacturer',
