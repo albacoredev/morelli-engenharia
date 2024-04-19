@@ -89,6 +89,28 @@
 		form.date = new Timestamp(new Date(date).getTime() / 1000, 0);
 	};
 
+	const equipmentOptions = ['Usar Aparelho da Lista', 'Inserir Aparelho Manualmente'];
+	let equipmentList: (typeof equipmentOptions)[number] = equipmentOptions[0];
+	const resetEquipment = (_: any) => {
+		if (equipmentList === 'Usar Aparelho da Lista') return;
+
+		form.deviceBrand = '';
+		form.deviceModel = '';
+		form.deviceSerialNumber = '';
+	};
+
+	const calibrationOptions = ['Usar Calibração da Lista', 'Inserir Calibração Manualmente'];
+	let calibrationList: (typeof calibrationOptions)[number] = calibrationOptions[0];
+	const resetCalibration = (_: any) => {
+		if (calibrationList === 'Usar Calibração da Lista') return;
+
+		form.calibrationBrand = '';
+		form.calibrationModel = '';
+		form.calibrationSerialNumber = '';
+	};
+
+	$: resetEquipment(equipmentList);
+	$: resetCalibration(calibrationList);
 	$: form.totalTime = calculateTotalTime(form.startingTime, form.endingTime);
 	$: form.signatures = signatures;
 	$: updateDate(createdDate);
@@ -157,42 +179,160 @@
 			<span class="text-lg text-secondary font-bold">Dados do Aparelho e Calibração</span>
 		</div>
 
+		<Radio
+			options={equipmentOptions}
+			name="equipmentList"
+			label="Aparelho"
+			bind:result
+			bind:selected={equipmentList}
+		/>
+
+		<div class="form-control w-full py-2">
+			<label class="label" for="equipmentBrands">
+				<span class="label-text">Selecione a Marca do Aparelho</span>
+			</label>
+			<select
+				class="select select-bordered select-primary w-full"
+				disabled={equipmentList == equipmentOptions[1]}
+				name="equipmentBrands"
+				bind:value={form.deviceBrand}
+			>
+				<option disabled selected>Selecionar</option>
+				<option>CHROMPACK</option>
+			</select>
+		</div>
+		<div class="form-control w-full py-2">
+			<label class="label" for="equipmentBrands">
+				<span class="label-text">Selecione o Modelo do Aparelho</span>
+			</label>
+			<select
+				class="select select-bordered select-primary w-full"
+				disabled={equipmentList == equipmentOptions[1]}
+				name="equipmentBrands"
+				bind:value={form.deviceModel}
+			>
+				<option disabled selected>Selecionar</option>
+				<option>SmartdB</option>
+			</select>
+		</div>
+		<div class="form-control w-full py-2">
+			<label class="label" for="equipmentBrands">
+				<span class="label-text">Selecione o Número de Série</span>
+			</label>
+			<select
+				class="select select-bordered select-primary w-full"
+				disabled={equipmentList == equipmentOptions[1]}
+				name="equipmentBrands"
+				bind:value={form.deviceSerialNumber}
+			>
+				<option disabled selected>Selecionar</option>
+				<option>394</option>
+				<option>396</option>
+				<option>401</option>
+				<option>407</option>
+				<option>410</option>
+				<option>5272</option>
+				<option>5273</option>
+				<option>5274</option>
+				<option>5275</option>
+				<option>5276</option>
+			</select>
+		</div>
+
 		<Input
 			placeholder={'Marca do Aparelho'}
 			bind:value={form.deviceBrand}
 			bind:result
 			name="deviceBrand"
+			disabled={equipmentList == equipmentOptions[0]}
 		/>
 		<Input
 			placeholder={'Modelo do Aparelho'}
 			bind:value={form.deviceModel}
 			bind:result
 			name="deviceModel"
+			disabled={equipmentList == equipmentOptions[0]}
 		/>
 		<Input
 			placeholder={'Número de Série do Aparelho'}
 			bind:value={form.deviceSerialNumber}
 			bind:result
 			name="deviceSerialNumber"
+			disabled={equipmentList == equipmentOptions[0]}
 		/>
+
+		<Radio
+			options={calibrationOptions}
+			name="calibrationList"
+			label="Calibração"
+			bind:result
+			bind:selected={calibrationList}
+		/>
+
+		<div class="form-control w-full py-2">
+			<label class="label" for="equipmentBrands">
+				<span class="label-text">Selecione a Marca da Calibração</span>
+			</label>
+			<select
+				class="select select-bordered select-primary w-full"
+				disabled={calibrationList == calibrationOptions[1]}
+				name="equipmentBrands"
+				bind:value={form.calibrationBrand}
+			>
+				<option disabled selected>Selecionar</option>
+				<option>CHROMPACK</option>
+			</select>
+		</div>
+		<div class="form-control w-full py-2">
+			<label class="label" for="equipmentBrands">
+				<span class="label-text">Selecione o Modelo da Calibração</span>
+			</label>
+			<select
+				class="select select-bordered select-primary w-full"
+				disabled={calibrationList == calibrationOptions[1]}
+				name="equipmentBrands"
+				bind:value={form.calibrationModel}
+			>
+				<option disabled selected>Selecionar</option>
+				<option>Smartcal</option>
+			</select>
+		</div>
+		<div class="form-control w-full py-2">
+			<label class="label" for="equipmentBrands">
+				<span class="label-text">Selecione o Número da Calibração</span>
+			</label>
+			<select
+				class="select select-bordered select-primary w-full"
+				disabled={calibrationList == calibrationOptions[1]}
+				name="equipmentBrands"
+				bind:value={form.calibrationSerialNumber}
+			>
+				<option disabled selected>Selecionar</option>
+				<option>CAL 050</option>
+				<option>CAL 1620</option>
+			</select>
+		</div>
 
 		<Input
 			placeholder={'Marca da Calibração'}
 			bind:value={form.calibrationBrand}
 			bind:result
 			name="calibrationBrand"
+			disabled={calibrationList == calibrationOptions[0]}
 		/>
 		<Input
 			placeholder={'Modelo da Calibração'}
 			bind:value={form.calibrationModel}
 			bind:result
 			name="calibrationModel"
+			disabled={calibrationList == calibrationOptions[0]}
 		/>
 		<Input
 			placeholder={'Número de Série da Calibração'}
 			bind:value={form.calibrationSerialNumber}
 			bind:result
 			name="calibrationSerialNumber"
+			disabled={calibrationList == calibrationOptions[0]}
 		/>
 
 		<Input
