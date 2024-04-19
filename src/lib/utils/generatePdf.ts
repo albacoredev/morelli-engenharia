@@ -111,14 +111,13 @@ export const generatePdf = (valuation: IHeatForm | INoiseForm, techniciansName: 
 		changeFontSize(10);
 
 		fields.forEach((field) => {
-			const fieldText = trimText(
-				`${labels[valuation.type][field as keyof (typeof labels)[valuation.type]]}: ${String(
-					form[field]
-				)}`,
+			const label = labels[valuation.type][field as keyof (typeof labels)[valuation.type]];
+			const value: string[] = doc.splitTextToSize(
+				`${label}: ${String(form[field])}`,
 				maxBodyTextWidth
 			);
-			doc.text(fieldText, xMargin, previousHeight + lineHeight + fieldMarginTop);
-			previousHeight += lineHeight + fieldMarginTop;
+			doc.text(value, xMargin, previousHeight + lineHeight + fieldMarginTop);
+			previousHeight += lineHeight * value.length + fieldMarginTop;
 		});
 	});
 
