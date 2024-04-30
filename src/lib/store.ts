@@ -21,6 +21,7 @@ export interface ValuationStore {
 
 export interface PhotosStore {
 	photosUrls: Array<string> | undefined;
+	names: Array<string> | undefined;
 	loading: boolean;
 	valuationId: string;
 }
@@ -32,6 +33,7 @@ export const userStore = writable<UserStore>({
 
 export const photosStore = writable<PhotosStore>({
 	photosUrls: undefined,
+	names: undefined,
 	loading: true,
 	valuationId: ''
 });
@@ -57,5 +59,5 @@ export const valuationsHandlers = {
 
 export const photosHandlers = {
 	read: async (valuationId: string) => await downloadPhotos(valuationId),
-	['delete']: async (photoUrl: string) => await deletePhoto(photoUrl)
+	['delete']: async (valuation: string, name: string) => await deletePhoto(valuation, name)
 };

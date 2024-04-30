@@ -34,29 +34,30 @@ export const downloadPhotos = async (valuationId?: string) => {
 		.then(async (res) => {
 			const { items } = res;
 			const urls = await Promise.all(items.map((item) => getDownloadURL(item)));
+			const names = await Promise.all(items.map((item) => item.name));
 
 			console.log(urls);
 
 			photosStore.update((curr) => ({
 				photosUrls: urls,
+				names,
 				loading: false,
 				valuationId: valuationId ? valuationId : curr.valuationId
 			}));
 		})
 		.catch((error) => {
-			// Uh-oh, an error occurred!
+			console.error(error);
 		});
 };
 
-export const deletePhoto = async (url: string) => {
-	const photoRef = ref(storage, encodeURI(url));
+export const deletePhoto = async (valuation: string, name: string) => {
+	const photoRef = ref(storage, `valuationPhotos/${valuation}/${name}`);
 
-	// Delete the file
 	deleteObject(photoRef)
 		.then(() => {
 			downloadPhotos();
 		})
 		.catch((error) => {
-			// Uh-oh, an error occurred!
+			console.error(error);
 		});
 };

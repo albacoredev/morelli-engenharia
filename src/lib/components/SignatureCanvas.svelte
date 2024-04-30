@@ -9,7 +9,6 @@
 	let canvas: HTMLCanvasElement | null = null;
 
 	$: signPad = canvas ? new SignaturePad(canvas) : null;
-	console.log(value);
 	$: signPad && value && signPad.fromDataURL(value);
 
 	const clearSignPad = () => signPad?.clear();

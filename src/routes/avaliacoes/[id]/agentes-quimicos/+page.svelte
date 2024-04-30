@@ -119,8 +119,6 @@
 	$: form.totalTime = calculateTotalTime(form.startingTime, form.endingTime);
 	$: form.signatures = signatures;
 	$: updateDate(createdDate);
-
-	console.log(form);
 </script>
 
 <div class="flex flex-col items-center my-0 mx-auto justify-center">

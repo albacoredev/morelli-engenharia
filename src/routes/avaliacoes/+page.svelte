@@ -37,6 +37,7 @@
 
 	let currentPhotosStore: PhotosStore = {
 		photosUrls: undefined,
+		names: undefined,
 		loading: true,
 		valuationId: ''
 	};
@@ -53,7 +54,7 @@
 	let input: HTMLInputElement;
 
 	const downloadPDF = (form: IHeatForm) => {
-		const emailSplit = currentUserStore?.user?.email?.split('@')[0].split('.') ?? ['', ''];
+		const emailSplit = currentUserStore?.user?.email ?? ['sem', 'nome'];
 		const firstName = emailSplit[0].charAt(0).toUpperCase() + emailSplit[0].slice(1);
 		const lastName = emailSplit[1].charAt(0).toUpperCase() + emailSplit[1].slice(1);
 		const technitiansName = `${firstName} ${lastName}`;
@@ -224,8 +225,12 @@
 				{#if currentPhotosStore.photosUrls.length === 0}
 					<span>Sem fotos</span>
 				{:else}
-					{#each currentPhotosStore.photosUrls as url}
-						<PhotoItem src={url} />
+					{#each currentPhotosStore.photosUrls as url, i}
+						<PhotoItem
+							src={url}
+							valuation={currentValuation ?? ''}
+							name={currentPhotosStore.names?.[i] ?? ''}
+						/>
 					{/each}
 				{/if}
 			</div>
