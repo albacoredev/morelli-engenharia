@@ -98,7 +98,12 @@
 			return;
 		}
 
-		form.date = new Timestamp(new Date(date).getTime() / 1000, 0);
+		let [day, month, year] = date.split('/');
+		let isoDateString = `${year}-${month}-${day}`;
+		let dateObject = new Date(Date.parse(isoDateString));
+		dateObject.setDate(dateObject.getDate() + 1);
+
+		form.date = new Timestamp(dateObject.getTime() / 1000, 0);
 	};
 
 	$: form.totalTime = calculateTotalTime(form.startingTime, form.endingTime);

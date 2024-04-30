@@ -30,7 +30,7 @@
 	const form = currentValuationStore.userValuations.filter((v) => v.id == valuationId)[0]
 		.data as unknown as INoiseForm;
 
-	let createdDate = form.date.toDate().toLocaleDateString('pt-BR');
+	let createdDate = new Intl.DateTimeFormat('pt-BR').format(form.date.toDate());
 
 	const signatures = {
 		[SignatureOwner.Evaluated]: form.signatures.evalueted,
@@ -86,7 +86,12 @@
 			return;
 		}
 
-		form.date = new Timestamp(new Date(date).getTime() / 1000, 0);
+		let [day, month, year] = date.split('/');
+		let isoDateString = `${year}-${month}-${day}`;
+		let dateObject = new Date(Date.parse(isoDateString));
+		dateObject.setDate(dateObject.getDate() + 1);
+
+		form.date = new Timestamp(dateObject.getTime() / 1000, 0);
 	};
 
 	const equipmentOptions = ['Usar Aparelho da Lista', 'Inserir Aparelho Manualmente'];
