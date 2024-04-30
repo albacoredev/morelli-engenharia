@@ -26,7 +26,7 @@ const labels = {
 	chemicalAgents: chemicalAgentsLabels
 };
 
-export const generatePdf = (valuation: IHeatForm | INoiseForm) => {
+export const generatePdf = (valuation: IHeatForm | INoiseForm, techniciansName: string) => {
 	const doc = new jsPDF();
 
 	const form = { ...valuation, date: valuation.date.toDate().toLocaleDateString('pt-BR') };
@@ -62,13 +62,16 @@ export const generatePdf = (valuation: IHeatForm | INoiseForm) => {
 	);
 
 	headerFields.unshift(`Avaliação Quantitativa de ${EValuationTypesDisplayName[form.type]}`);
+	headerFields.push(`Número de Amostragem: ${valuation.sampleNumber}`);
 
 	doc.setFillColor(214, 211, 209);
 	doc.rect(0, 0, pageWidth, headerHeight, 'F');
 
-	headerFields.forEach((field, index) => {
-		doc.text(field, xMargin, yMargin + (lineHeight + textGap) * index);
-	});
+	headerFields
+		.filter((field) => field !== '')
+		.forEach((field, index) => {
+			doc.text(field, xMargin, yMargin + (lineHeight + textGap) * index);
+		});
 
 	doc.addImage({
 		imageData: encondedImage.base64,
@@ -108,14 +111,13 @@ export const generatePdf = (valuation: IHeatForm | INoiseForm) => {
 		changeFontSize(10);
 
 		fields.forEach((field) => {
-			const fieldText = trimText(
-				`${labels[valuation.type][field as keyof (typeof labels)[valuation.type]]}: ${String(
-					form[field]
-				)}`,
+			const label = labels[valuation.type][field as keyof (typeof labels)[valuation.type]];
+			const value: string[] = doc.splitTextToSize(
+				`${label}: ${String(form[field])}`,
 				maxBodyTextWidth
 			);
-			doc.text(fieldText, xMargin, previousHeight + lineHeight + fieldMarginTop);
-			previousHeight += lineHeight + fieldMarginTop;
+			doc.text(value, xMargin, previousHeight + lineHeight + fieldMarginTop);
+			previousHeight += lineHeight * value.length + fieldMarginTop;
 		});
 	});
 
@@ -125,11 +127,17 @@ export const generatePdf = (valuation: IHeatForm | INoiseForm) => {
 		doc.addImage({
 			imageData: evaluatorSignature,
 			x: xMargin,
-			y: pageHeight - 44 - lineHeight,
-			width: 80,
-			height: 30
+			y: pageHeight - lineHeight * 3 - 15,
+			width: 40,
+			height: 15
 		});
 	}
+
+	doc.text(
+		techniciansName,
+		(80 - doc.getTextWidth('Responsável Técnico avaliador')) / 2 + xMargin,
+		pageHeight - lineHeight * 2
+	);
 
 	doc.text(
 		'Responsável Técnico avaliador',
@@ -140,12 +148,18 @@ export const generatePdf = (valuation: IHeatForm | INoiseForm) => {
 	if (evaluatedSignature != '') {
 		doc.addImage({
 			imageData: evaluatedSignature,
-			x: pageWidth - xMargin - 80,
-			y: pageHeight - 44 - lineHeight,
-			width: 80,
-			height: 30
+			x: pageWidth - xMargin - 40,
+			y: pageHeight - lineHeight * 3 - 15,
+			width: 40,
+			height: 15
 		});
 	}
+
+	doc.text(
+		valuation.name,
+		pageWidth - xMargin - 80 + (80 - doc.getTextWidth('Colaborador Avaliado')) / 2,
+		pageHeight - lineHeight * 2
+	);
 
 	doc.text(
 		'Colaborador Avaliado',

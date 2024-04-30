@@ -2,15 +2,23 @@
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { SignatureOwner } from '$lib/firebase/signatures';
-	import type { INoiseForm } from '$lib/interfaces/forms/noise';
-	import { type UserStore, userStore } from '$lib/store';
+	import { type UserStore, userStore, valuationStore, type ValuationStore } from '$lib/store';
 	import getTotalTime from '$lib/utils/getTotalTime';
 	import { Timestamp } from 'firebase/firestore';
 	import { onDestroy } from 'svelte';
-	import suite from '$lib/vestSuites/noise';
+	import suite from '$lib/vestSuites/vibration';
 	import Input from '$lib/components/Input.svelte';
-	import Radio from '$lib/components/Radio.svelte';
 	import SignatureCanvas from '$lib/components/SignatureCanvas.svelte';
+	import {
+		vibrationLabels,
+		type IVibrationForm,
+		EConservationOptions,
+		EPhysicalStressOptions,
+		EWorkerPostureOptions,
+		ERoutineActivityOptions
+	} from '$lib/interfaces/forms/vibration';
+	import Radio from '$lib/components/Radio.svelte';
+	import { page } from '$app/stores';
 
 	let currentUserStore: UserStore = {
 		user: null,
@@ -19,18 +27,22 @@
 
 	userStore.subscribe((store) => (currentUserStore = store));
 
+	userStore.subscribe((store) => (currentUserStore = store));
+
+	let currentValuationStore = {} as ValuationStore;
+	valuationStore.subscribe((v) => (currentValuationStore = v));
+
+	const valuationId = $page.url.href.split('/').at(-2);
+
+	const form = currentValuationStore.userValuations.filter((v) => v.id == valuationId)[0]
+		.data as unknown as IVibrationForm;
+
+	let createdDate = new Intl.DateTimeFormat('pt-BR').format(form.date.toDate());
+
 	const signatures = {
-		[SignatureOwner.Evaluated]: '',
-		[SignatureOwner.Evaluator]: ''
+		[SignatureOwner.Evaluated]: form.signatures.evalueted,
+		[SignatureOwner.Evaluator]: form.signatures.evaluator
 	};
-
-	let createdDate = '';
-
-	const form = {
-		type: 'noise',
-		signatures
-	} as unknown as INoiseForm;
-
 	let result = suite.get();
 
 	let savingValuation = false;
@@ -60,9 +72,9 @@
 
 			const { valuationsHandlers } = await import('$lib/store');
 
-			await valuationsHandlers.add(form);
+			await valuationsHandlers.update(currentUserStore.user.uid, valuationId ?? '', form);
 
-			await goto('../avaliacoes');
+			await goto('../');
 		}
 	};
 
@@ -91,21 +103,14 @@
 	const equipmentOptions = ['Usar Aparelho da Lista', 'Inserir Aparelho Manualmente'];
 	let equipmentList: (typeof equipmentOptions)[number] = equipmentOptions[0];
 	const resetEquipment = (_: any) => {
-		form.deviceBrand = '';
-		form.deviceModel = '';
-		form.deviceSerialNumber = '';
-	};
+		if (equipmentList === 'Usar Aparelho da Lista') return;
 
-	const calibrationOptions = ['Usar Calibração da Lista', 'Inserir Calibração Manualmente'];
-	let calibrationList: (typeof calibrationOptions)[number] = calibrationOptions[0];
-	const resetCalibration = (_: any) => {
-		form.calibrationBrand = '';
-		form.calibrationModel = '';
-		form.calibrationSerialNumber = '';
+		form.brand = '';
+		form.model = '';
+		form.serialNumber = '';
 	};
 
 	$: resetEquipment(equipmentList);
-	$: resetCalibration(calibrationList);
 	$: form.totalTime = calculateTotalTime(form.startingTime, form.endingTime);
 	$: form.signatures = signatures;
 	$: updateDate(createdDate);
@@ -114,7 +119,7 @@
 <div class="flex flex-col items-center my-0 mx-auto justify-center">
 	<div class="navbar bg-base-100">
 		<div class="flex-none">
-			<a href="../home">
+			<a href="../">
 				<button class="btn btn-square btn-ghost">
 					<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
 						><g id="SVGRepo_bgCarrier" stroke-width="0" /><g
@@ -138,7 +143,7 @@
 			</a>
 		</div>
 		<div class="flex-1">
-			<span class="normal-case text-xl px-4">Criar Avaliação Quantitativa de Ruído</span>
+			<span class="normal-case text-xl px-4">Criar Avaliação Quantitativa de Vibração</span>
 		</div>
 	</div>
 
@@ -167,13 +172,49 @@
 		<Input placeholder={'Função'} bind:value={form.function} bind:result name="function" />
 		<Input placeholder={'Setor'} bind:value={form.sector} bind:result name="sector" />
 		<Input placeholder={'GHE'} bind:value={form.ghe} bind:result name="ghe" />
-		<Input placeholder={'EPI'} bind:value={form.epi} bind:result name="epi" type="textArea" />
-		<Input placeholder={'EPC'} bind:value={form.epc} bind:result name="epc" type="textArea" />
 
 		<div class="divider py-4">
-			<span class="text-lg text-secondary font-bold">Dados do Aparelho e Calibração</span>
+			<span class="text-lg text-secondary font-bold"
+				>Características das Máquinas/Veículos/Ferramentas/Equipamentos de Trabalho</span
+			>
 		</div>
 
+		<Input
+			placeholder={vibrationLabels.manufacturer}
+			bind:value={form.manufacturer}
+			bind:result
+			name="manufacturer"
+		/>
+		<Input placeholder={vibrationLabels.year} bind:value={form.year} bind:result name="year" />
+		<Radio
+			options={Object.values(EConservationOptions)}
+			name="conservation"
+			label={vibrationLabels.conservation}
+			bind:result
+			bind:selected={form.conservation}
+		/>
+		<Input
+			placeholder={vibrationLabels.avgSpeed}
+			bind:value={form.avgSpeed}
+			bind:result
+			name="avgSpeed"
+		/>
+		<Input
+			placeholder={vibrationLabels.vibrationLevels}
+			bind:value={form.vibrationLevels}
+			bind:result
+			name="vibrationLevels"
+		/>
+		<Input
+			placeholder={vibrationLabels.transportedCargo}
+			bind:value={form.transportedCargo}
+			bind:result
+			name="transportedCargo"
+		/>
+
+		<div class="divider py-4">
+			<span class="text-lg text-secondary font-bold">Dados do Aparelho de Medição</span>
+		</div>
 		<Radio
 			options={equipmentOptions}
 			name="equipmentList"
@@ -190,7 +231,7 @@
 				class="select select-bordered select-primary w-full"
 				disabled={equipmentList == equipmentOptions[1]}
 				name="equipmentBrands"
-				bind:value={form.deviceBrand}
+				bind:value={form.brand}
 			>
 				<option disabled selected>Selecionar</option>
 				<option>CHROMPACK</option>
@@ -204,10 +245,10 @@
 				class="select select-bordered select-primary w-full"
 				disabled={equipmentList == equipmentOptions[1]}
 				name="equipmentBrands"
-				bind:value={form.deviceModel}
+				bind:value={form.model}
 			>
 				<option disabled selected>Selecionar</option>
-				<option>SmartdB</option>
+				<option>SmartVib</option>
 			</select>
 		</div>
 		<div class="form-control w-full py-2">
@@ -218,133 +259,34 @@
 				class="select select-bordered select-primary w-full"
 				disabled={equipmentList == equipmentOptions[1]}
 				name="equipmentBrands"
-				bind:value={form.deviceSerialNumber}
+				bind:value={form.serialNumber}
 			>
 				<option disabled selected>Selecionar</option>
-				<option>394</option>
-				<option>396</option>
-				<option>401</option>
-				<option>407</option>
-				<option>410</option>
-				<option>5272</option>
-				<option>5273</option>
-				<option>5274</option>
-				<option>5275</option>
-				<option>5276</option>
+				<option>734</option>
 			</select>
 		</div>
 
 		<Input
-			placeholder={'Marca do Aparelho'}
-			bind:value={form.deviceBrand}
+			placeholder={vibrationLabels.brand}
+			bind:value={form.brand}
 			bind:result
-			name="deviceBrand"
+			name="brand"
 			disabled={equipmentList == equipmentOptions[0]}
 		/>
 		<Input
-			placeholder={'Modelo do Aparelho'}
-			bind:value={form.deviceModel}
+			placeholder={vibrationLabels.model}
+			bind:value={form.model}
 			bind:result
-			name="deviceModel"
+			name="model"
 			disabled={equipmentList == equipmentOptions[0]}
 		/>
 		<Input
-			placeholder={'Número de Série do Aparelho'}
-			bind:value={form.deviceSerialNumber}
+			placeholder={vibrationLabels.serialNumber}
+			bind:value={form.serialNumber}
 			bind:result
-			name="deviceSerialNumber"
+			name="serialNumber"
 			disabled={equipmentList == equipmentOptions[0]}
 		/>
-
-		<Radio
-			options={calibrationOptions}
-			name="calibrationList"
-			label="Calibração"
-			bind:result
-			bind:selected={calibrationList}
-		/>
-
-		<div class="form-control w-full py-2">
-			<label class="label" for="equipmentBrands">
-				<span class="label-text">Selecione a Marca da Calibração</span>
-			</label>
-			<select
-				class="select select-bordered select-primary w-full"
-				disabled={calibrationList == calibrationOptions[1]}
-				name="equipmentBrands"
-				bind:value={form.calibrationBrand}
-			>
-				<option disabled selected>Selecionar</option>
-				<option>CHROMPACK</option>
-			</select>
-		</div>
-		<div class="form-control w-full py-2">
-			<label class="label" for="equipmentBrands">
-				<span class="label-text">Selecione o Modelo da Calibração</span>
-			</label>
-			<select
-				class="select select-bordered select-primary w-full"
-				disabled={calibrationList == calibrationOptions[1]}
-				name="equipmentBrands"
-				bind:value={form.calibrationModel}
-			>
-				<option disabled selected>Selecionar</option>
-				<option>Smartcal</option>
-			</select>
-		</div>
-		<div class="form-control w-full py-2">
-			<label class="label" for="equipmentBrands">
-				<span class="label-text">Selecione o Número da Calibração</span>
-			</label>
-			<select
-				class="select select-bordered select-primary w-full"
-				disabled={calibrationList == calibrationOptions[1]}
-				name="equipmentBrands"
-				bind:value={form.calibrationSerialNumber}
-			>
-				<option disabled selected>Selecionar</option>
-				<option>CAL 050</option>
-				<option>CAL 1620</option>
-			</select>
-		</div>
-
-		<Input
-			placeholder={'Marca da Calibração'}
-			bind:value={form.calibrationBrand}
-			bind:result
-			name="calibrationBrand"
-			disabled={calibrationList == calibrationOptions[0]}
-		/>
-		<Input
-			placeholder={'Modelo da Calibração'}
-			bind:value={form.calibrationModel}
-			bind:result
-			name="calibrationModel"
-			disabled={calibrationList == calibrationOptions[0]}
-		/>
-		<Input
-			placeholder={'Número de Série da Calibração'}
-			bind:value={form.calibrationSerialNumber}
-			bind:result
-			name="calibrationSerialNumber"
-			disabled={calibrationList == calibrationOptions[0]}
-		/>
-
-		<Input
-			placeholder={'Calibração Inicial'}
-			bind:value={form.startingCalibration}
-			bind:result
-			name="calibrationSerialNumber"
-		/>
-
-		<Input
-			placeholder={'Calibração Final'}
-			bind:value={form.endingCalibration}
-			bind:result
-			name="calibrationSerialNumber"
-		/>
-
-		<Input placeholder={'Desvio'} bind:value={form.errorMaring} bind:result name="errorMaring" />
 
 		<div class="divider py-4">
 			<span class="text-lg text-secondary font-bold">Dados da Amostragem</span>
@@ -358,7 +300,6 @@
 			name="startingTime"
 			mask="00:00:00"
 		/>
-
 		<Input
 			placeholder={'Hora Final'}
 			dataCyType="time"
@@ -367,7 +308,6 @@
 			name="endingTime"
 			mask="00:00:00"
 		/>
-
 		<Input
 			placeholder={'Tempo'}
 			bind:value={form.totalTime}
@@ -375,22 +315,50 @@
 			name="totalTime"
 			disabled
 		/>
-
-		<Input
-			placeholder={'Pausa'}
-			dataCyType="time"
-			bind:value={form.interval}
+		<Radio
+			options={Object.values(EPhysicalStressOptions)}
+			name="physicalStress"
+			label={vibrationLabels.physicalStress}
 			bind:result
-			name="interval"
-			mask="00:00:00"
+			bind:selected={form.physicalStress}
 		/>
-
+		<Radio
+			options={Object.values(EWorkerPostureOptions)}
+			name="workerPosture"
+			label={vibrationLabels.workerPosture}
+			bind:result
+			bind:selected={form.workerPosture}
+		/>
 		<Input
-			placeholder={'Tarefas Executadas'}
+			placeholder={vibrationLabels.surfaceType}
+			bind:value={form.surfaceType}
+			bind:result
+			name="surfaceType"
+		/>
+		<Input
+			placeholder={vibrationLabels.aggravatingCondition}
+			bind:value={form.aggravatingCondition}
+			bind:result
+			name="aggravatingCondition"
+		/>
+		<Radio
+			options={Object.values(ERoutineActivityOptions)}
+			name="routineActivity"
+			label={vibrationLabels.routineActivity}
+			bind:result
+			bind:selected={form.routineActivity}
+		/>
+		<Input
+			placeholder={vibrationLabels.estimatedExposureTime}
+			bind:value={form.estimatedExposureTime}
+			bind:result
+			name="estimatedExposureTime"
+		/>
+		<Input
+			placeholder={vibrationLabels.activities}
 			bind:value={form.activities}
 			bind:result
 			name="activities"
-			type="textArea"
 		/>
 
 		<SignatureCanvas holder={SignatureOwner.Evaluated} bind:value={signatures.evalueted} />

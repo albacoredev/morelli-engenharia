@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { SignatureOwner } from '$lib/firebase/signatures';
 	import SignaturePad from 'signature_pad';
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 
 	export let holder: SignatureOwner;
 	export let value = '';
@@ -9,6 +9,7 @@
 	let canvas: HTMLCanvasElement | null = null;
 
 	$: signPad = canvas ? new SignaturePad(canvas) : null;
+	$: signPad && value && signPad.fromDataURL(value);
 
 	const clearSignPad = () => signPad?.clear();
 
@@ -27,7 +28,7 @@
 	onMount(resizeCanvas);
 
 	$: signPad?.addEventListener('endStroke', () => {
-		value = signPad?.toDataURL('image/png').split(',')[1] ?? '';
+		value = signPad?.toDataURL() ?? '';
 	});
 </script>
 

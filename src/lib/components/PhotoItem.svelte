@@ -2,6 +2,8 @@
 	import { photosHandlers } from '$lib/store';
 
 	export let src: string;
+	export let valuation: string;
+	export let name: string;
 
 	const downloadPhoto = async () => {
 		try {
@@ -30,7 +32,7 @@
 	<button
 		type="button"
 		class="btn btn-square btn-sm btn-primary"
-		on:click={() => photosHandlers.delete(src)}
+		on:click={() => photosHandlers.delete(valuation, name)}
 	>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"

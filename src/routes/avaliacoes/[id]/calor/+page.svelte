@@ -1,23 +1,27 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
-	import { SignatureOwner } from '$lib/firebase/signatures';
-	import { type UserStore, userStore } from '$lib/store';
-	import getTotalTime from '$lib/utils/getTotalTime';
-	import { Timestamp } from 'firebase/firestore';
-	import { onDestroy } from 'svelte';
-	import suite from '$lib/vestSuites/vibration';
 	import Input from '$lib/components/Input.svelte';
-	import SignatureCanvas from '$lib/components/SignatureCanvas.svelte';
-	import {
-		vibrationLabels,
-		type IVibrationForm,
-		EConservationOptions,
-		EPhysicalStressOptions,
-		EWorkerPostureOptions,
-		ERoutineActivityOptions
-	} from '$lib/interfaces/forms/vibration';
 	import Radio from '$lib/components/Radio.svelte';
+	import {
+		EActivitiesOptions,
+		EClimaticConditions,
+		EEnviromentOptions,
+		EEnviromentSolarIncidenceOptions,
+		EMethodologyOptions,
+		ERestOptions,
+		EValuationOptions,
+		EVentilationOptions,
+		type IHeatForm
+	} from '$lib/interfaces/forms/heat';
+	import { userStore, valuationStore, type UserStore, type ValuationStore } from '$lib/store';
+	import getTotalTime from '$lib/utils/getTotalTime';
+	import suite from '$lib/vestSuites/heat';
+	import { goto } from '$app/navigation';
+	import { onDestroy } from 'svelte';
+	import SignatureCanvas from '$lib/components/SignatureCanvas.svelte';
+	import { SignatureOwner } from '$lib/firebase/signatures';
+	import { Timestamp } from 'firebase/firestore';
+	import { page } from '$app/stores';
 
 	let currentUserStore: UserStore = {
 		user: null,
@@ -26,21 +30,20 @@
 
 	userStore.subscribe((store) => (currentUserStore = store));
 
+	let currentValuationStore = {} as ValuationStore;
+	valuationStore.subscribe((v) => (currentValuationStore = v));
+
+	const valuationId = $page.url.href.split('/').at(-2);
+
+	const form = currentValuationStore.userValuations.filter((v) => v.id == valuationId)[0]
+		.data as unknown as IHeatForm;
+
+	let createdDate = new Intl.DateTimeFormat('pt-BR').format(form.date.toDate());
+
 	const signatures = {
-		[SignatureOwner.Evaluated]: '',
-		[SignatureOwner.Evaluator]: ''
+		[SignatureOwner.Evaluated]: form.signatures.evalueted,
+		[SignatureOwner.Evaluator]: form.signatures.evaluator
 	};
-
-	let createdDate = '';
-
-	const form = {
-		type: 'vibration',
-		signatures,
-		conservation: '',
-		physicalStress: '',
-		workerPosture: '',
-		routineActivity: ''
-	} as unknown as IVibrationForm;
 
 	let result = suite.get();
 
@@ -71,9 +74,9 @@
 
 			const { valuationsHandlers } = await import('$lib/store');
 
-			await valuationsHandlers.add(form);
+			await valuationsHandlers.update(currentUserStore.user.uid, valuationId ?? '', form);
 
-			await goto('../avaliacoes');
+			await goto('../');
 		}
 	};
 
@@ -99,15 +102,6 @@
 		form.date = new Timestamp(dateObject.getTime() / 1000, 0);
 	};
 
-	const equipmentOptions = ['Usar Aparelho da Lista', 'Inserir Aparelho Manualmente'];
-	let equipmentList: (typeof equipmentOptions)[number] = equipmentOptions[0];
-	const resetEquipment = (_: any) => {
-		form.brand = '';
-		form.model = '';
-		form.serialNumber = '';
-	};
-
-	$: resetEquipment(equipmentList);
 	$: form.totalTime = calculateTotalTime(form.startingTime, form.endingTime);
 	$: form.signatures = signatures;
 	$: updateDate(createdDate);
@@ -116,7 +110,7 @@
 <div class="flex flex-col items-center my-0 mx-auto justify-center">
 	<div class="navbar bg-base-100">
 		<div class="flex-none">
-			<a href="../home">
+			<a href="../">
 				<button class="btn btn-square btn-ghost">
 					<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
 						><g id="SVGRepo_bgCarrier" stroke-width="0" /><g
@@ -140,7 +134,7 @@
 			</a>
 		</div>
 		<div class="flex-1">
-			<span class="normal-case text-xl px-4">Criar Avaliação Quantitativa de Vibração</span>
+			<span class="normal-case text-xl px-4">Criar Avaliação Quantitativa de Calor</span>
 		</div>
 	</div>
 
@@ -160,6 +154,20 @@
 			bind:value={form.sampleNumber}
 			bind:result
 		/>
+		<Radio
+			options={Object.values(EValuationOptions)}
+			name="valuation"
+			label="Avaliação"
+			bind:result
+			bind:selected={form.valuation}
+		/>
+		<Radio
+			options={Object.values(EMethodologyOptions)}
+			name="methodology"
+			label="Metodologia"
+			bind:result
+			bind:selected={form.methodology}
+		/>
 
 		<div class="divider py-4">
 			<span class="text-lg text-secondary font-bold">Dados do Colaborador</span>
@@ -169,57 +177,21 @@
 		<Input placeholder={'Função'} bind:value={form.function} bind:result name="function" />
 		<Input placeholder={'Setor'} bind:value={form.sector} bind:result name="sector" />
 		<Input placeholder={'GHE'} bind:value={form.ghe} bind:result name="ghe" />
+		<Input placeholder={'EPI'} bind:value={form.epi} bind:result name="epi" type="textArea" />
+		<Input placeholder={'EPC'} bind:value={form.epc} bind:result name="epc" type="textArea" />
+		<Input
+			placeholder={'Descrição das Atividades'}
+			bind:value={form.activitiesDescription}
+			bind:result
+			name="activitiesDescription"
+			type="textArea"
+		/>
 
 		<div class="divider py-4">
 			<span class="text-lg text-secondary font-bold"
-				>Características das Máquinas/Veículos/Ferramentas/Equipamentos de Trabalho</span
+				>Características dos Equipamentos de Trabalho</span
 			>
 		</div>
-
-		<Input
-			placeholder={vibrationLabels.manufacturer}
-			bind:value={form.manufacturer}
-			bind:result
-			name="manufacturer"
-		/>
-		<Input placeholder={vibrationLabels.year} bind:value={form.year} bind:result name="year" />
-		<Radio
-			options={Object.values(EConservationOptions)}
-			name="conservation"
-			label={vibrationLabels.conservation}
-			bind:result
-			bind:selected={form.conservation}
-		/>
-		<Input
-			placeholder={vibrationLabels.avgSpeed}
-			bind:value={form.avgSpeed}
-			bind:result
-			name="avgSpeed"
-		/>
-		<Input
-			placeholder={vibrationLabels.vibrationLevels}
-			bind:value={form.vibrationLevels}
-			bind:result
-			name="vibrationLevels"
-		/>
-		<Input
-			placeholder={vibrationLabels.transportedCargo}
-			bind:value={form.transportedCargo}
-			bind:result
-			name="transportedCargo"
-		/>
-
-		<div class="divider py-4">
-			<span class="text-lg text-secondary font-bold">Dados do Aparelho de Medição</span>
-		</div>
-
-		<Radio
-			options={equipmentOptions}
-			name="equipmentList"
-			label="Aparelho"
-			bind:result
-			bind:selected={equipmentList}
-		/>
 
 		<div class="form-control w-full py-2">
 			<label class="label" for="equipmentBrands">
@@ -227,7 +199,6 @@
 			</label>
 			<select
 				class="select select-bordered select-primary w-full"
-				disabled={equipmentList == equipmentOptions[1]}
 				name="equipmentBrands"
 				bind:value={form.brand}
 			>
@@ -241,12 +212,11 @@
 			</label>
 			<select
 				class="select select-bordered select-primary w-full"
-				disabled={equipmentList == equipmentOptions[1]}
 				name="equipmentBrands"
 				bind:value={form.model}
 			>
 				<option disabled selected>Selecionar</option>
-				<option>SmartVib</option>
+				<option>Net. temp</option>
 			</select>
 		</div>
 		<div class="form-control w-full py-2">
@@ -255,40 +225,83 @@
 			</label>
 			<select
 				class="select select-bordered select-primary w-full"
-				disabled={equipmentList == equipmentOptions[1]}
 				name="equipmentBrands"
 				bind:value={form.serialNumber}
 			>
 				<option disabled selected>Selecionar</option>
-				<option>734</option>
+				<option>IBU0084</option>
 			</select>
 		</div>
-
-		<Input
-			placeholder={vibrationLabels.brand}
-			bind:value={form.brand}
-			bind:result
-			name="brand"
-			disabled={equipmentList == equipmentOptions[0]}
-		/>
-		<Input
-			placeholder={vibrationLabels.model}
-			bind:value={form.model}
-			bind:result
-			name="model"
-			disabled={equipmentList == equipmentOptions[0]}
-		/>
-		<Input
-			placeholder={vibrationLabels.serialNumber}
-			bind:value={form.serialNumber}
-			bind:result
-			name="serialNumber"
-			disabled={equipmentList == equipmentOptions[0]}
-		/>
 
 		<div class="divider py-4">
 			<span class="text-lg text-secondary font-bold">Dados da Amostragem</span>
 		</div>
+
+		<Radio
+			options={Object.values(EClimaticConditions)}
+			name="climaticConditions"
+			label="Condições Climáticas"
+			bind:result
+			bind:selected={form.climaticConditions}
+		/>
+
+		<Radio
+			options={Object.values(EEnviromentOptions)}
+			name="environment"
+			label="Ambiente"
+			bind:result
+			bind:selected={form.environment}
+		/>
+
+		<Radio
+			options={Object.values(EVentilationOptions)}
+			name="ventilation"
+			label="Ventilação"
+			bind:result
+			bind:selected={form.ventilation}
+		/>
+
+		<Radio
+			options={Object.values(EEnviromentSolarIncidenceOptions)}
+			name="enviromentSolarIncidence"
+			label="Ambiente"
+			bind:result
+			bind:selected={form.enviromentSolarIncidence}
+		/>
+
+		<Input
+			placeholder={'Fonte de Calor'}
+			bind:value={form.heatSource}
+			bind:result
+			name="heatSource"
+		/>
+
+		<Radio
+			options={Object.values(ERestOptions)}
+			name="rest"
+			label="Descanso"
+			bind:result
+			bind:selected={form.rest}
+		/>
+
+		<Radio
+			options={Object.values(EActivitiesOptions)}
+			name="activities"
+			label="Atividade"
+			bind:result
+			bind:selected={form.activities}
+		/>
+
+		<Input
+			placeholder={'Temperatura'}
+			bind:value={form.temperature}
+			bind:result
+			name="temperature"
+		/>
+
+		<Input placeholder={'Umidade'} bind:value={form.humidity} bind:result name="humidity" />
+
+		<Input placeholder={'Vento'} bind:value={form.wind} bind:result name="wind" />
 
 		<Input
 			placeholder={'Hora Inicial'}
@@ -298,6 +311,7 @@
 			name="startingTime"
 			mask="00:00:00"
 		/>
+
 		<Input
 			placeholder={'Hora Final'}
 			dataCyType="time"
@@ -306,57 +320,13 @@
 			name="endingTime"
 			mask="00:00:00"
 		/>
+
 		<Input
 			placeholder={'Tempo'}
 			bind:value={form.totalTime}
 			bind:result
 			name="totalTime"
 			disabled
-		/>
-		<Radio
-			options={Object.values(EPhysicalStressOptions)}
-			name="physicalStress"
-			label={vibrationLabels.physicalStress}
-			bind:result
-			bind:selected={form.physicalStress}
-		/>
-		<Radio
-			options={Object.values(EWorkerPostureOptions)}
-			name="workerPosture"
-			label={vibrationLabels.workerPosture}
-			bind:result
-			bind:selected={form.workerPosture}
-		/>
-		<Input
-			placeholder={vibrationLabels.surfaceType}
-			bind:value={form.surfaceType}
-			bind:result
-			name="surfaceType"
-		/>
-		<Input
-			placeholder={vibrationLabels.aggravatingCondition}
-			bind:value={form.aggravatingCondition}
-			bind:result
-			name="aggravatingCondition"
-		/>
-		<Radio
-			options={Object.values(ERoutineActivityOptions)}
-			name="routineActivity"
-			label={vibrationLabels.routineActivity}
-			bind:result
-			bind:selected={form.routineActivity}
-		/>
-		<Input
-			placeholder={vibrationLabels.estimatedExposureTime}
-			bind:value={form.estimatedExposureTime}
-			bind:result
-			name="estimatedExposureTime"
-		/>
-		<Input
-			placeholder={vibrationLabels.activities}
-			bind:value={form.activities}
-			bind:result
-			name="activities"
 		/>
 
 		<SignatureCanvas holder={SignatureOwner.Evaluated} bind:value={signatures.evalueted} />

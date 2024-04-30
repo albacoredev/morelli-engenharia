@@ -64,7 +64,7 @@ export type TChemicalAgentsValuationPDFSections = {
 };
 
 export const chemicalAgentsSections: TChemicalAgentsValuationPDFSections = {
-	header: ['company', 'date', 'sampleNumber'],
+	header: ['company', 'date'],
 	'Dados do Colaborador': ['name', 'function', 'sector', 'ghe', 'epi', 'epc'],
 	'Dados do Aparelho e Calibração': [
 		'deviceBrand',

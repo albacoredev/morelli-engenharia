@@ -98,7 +98,12 @@
 			return;
 		}
 
-		form.date = new Timestamp(new Date(date).getTime() / 1000, 0);
+		let [day, month, year] = date.split('/');
+		let isoDateString = `${year}-${month}-${day}`;
+		let dateObject = new Date(Date.parse(isoDateString));
+		dateObject.setDate(dateObject.getDate() + 1);
+
+		form.date = new Timestamp(dateObject.getTime() / 1000, 0);
 	};
 
 	$: form.totalTime = calculateTotalTime(form.startingTime, form.endingTime);
@@ -178,6 +183,13 @@
 		<Input placeholder={'GHE'} bind:value={form.ghe} bind:result name="ghe" />
 		<Input placeholder={'EPI'} bind:value={form.epi} bind:result name="epi" type="textArea" />
 		<Input placeholder={'EPC'} bind:value={form.epc} bind:result name="epc" type="textArea" />
+		<Input
+			placeholder={'Descrição das Atividades'}
+			bind:value={form.activitiesDescription}
+			bind:result
+			name="activitiesDescription"
+			type="textArea"
+		/>
 
 		<div class="divider py-4">
 			<span class="text-lg text-secondary font-bold"
@@ -185,14 +197,45 @@
 			>
 		</div>
 
-		<Input placeholder={'Marca'} bind:value={form.brand} bind:result name="brand" />
-		<Input placeholder={'Modelo'} bind:value={form.model} bind:result name="model" />
-		<Input
-			placeholder={'Número de Série'}
-			bind:value={form.serialNumber}
-			bind:result
-			name="serialNumber"
-		/>
+		<div class="form-control w-full py-2">
+			<label class="label" for="equipmentBrands">
+				<span class="label-text">Selecione a Marca do Aparelho</span>
+			</label>
+			<select
+				class="select select-bordered select-primary w-full"
+				name="equipmentBrands"
+				bind:value={form.brand}
+			>
+				<option disabled selected>Selecionar</option>
+				<option>CHROMPACK</option>
+			</select>
+		</div>
+		<div class="form-control w-full py-2">
+			<label class="label" for="equipmentBrands">
+				<span class="label-text">Selecione o Modelo do Aparelho</span>
+			</label>
+			<select
+				class="select select-bordered select-primary w-full"
+				name="equipmentBrands"
+				bind:value={form.model}
+			>
+				<option disabled selected>Selecionar</option>
+				<option>Net. temp</option>
+			</select>
+		</div>
+		<div class="form-control w-full py-2">
+			<label class="label" for="equipmentBrands">
+				<span class="label-text">Selecione o Número de Série</span>
+			</label>
+			<select
+				class="select select-bordered select-primary w-full"
+				name="equipmentBrands"
+				bind:value={form.serialNumber}
+			>
+				<option disabled selected>Selecionar</option>
+				<option>IBU0084</option>
+			</select>
+		</div>
 
 		<div class="divider py-4">
 			<span class="text-lg text-secondary font-bold">Dados da Amostragem</span>

@@ -3,7 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { SignatureOwner } from '$lib/firebase/signatures';
 	import type { INoiseForm } from '$lib/interfaces/forms/noise';
-	import { type UserStore, userStore } from '$lib/store';
+	import { type UserStore, userStore, valuationStore, type ValuationStore } from '$lib/store';
 	import getTotalTime from '$lib/utils/getTotalTime';
 	import { Timestamp } from 'firebase/firestore';
 	import { onDestroy } from 'svelte';
@@ -11,6 +11,7 @@
 	import Input from '$lib/components/Input.svelte';
 	import Radio from '$lib/components/Radio.svelte';
 	import SignatureCanvas from '$lib/components/SignatureCanvas.svelte';
+	import { page } from '$app/stores';
 
 	let currentUserStore: UserStore = {
 		user: null,
@@ -19,17 +20,22 @@
 
 	userStore.subscribe((store) => (currentUserStore = store));
 
+	userStore.subscribe((store) => (currentUserStore = store));
+
+	let currentValuationStore = {} as ValuationStore;
+	valuationStore.subscribe((v) => (currentValuationStore = v));
+
+	const valuationId = $page.url.href.split('/').at(-2);
+
+	const form = currentValuationStore.userValuations.filter((v) => v.id == valuationId)[0]
+		.data as unknown as INoiseForm;
+
+	let createdDate = new Intl.DateTimeFormat('pt-BR').format(form.date.toDate());
+
 	const signatures = {
-		[SignatureOwner.Evaluated]: '',
-		[SignatureOwner.Evaluator]: ''
+		[SignatureOwner.Evaluated]: form.signatures.evalueted,
+		[SignatureOwner.Evaluator]: form.signatures.evaluator
 	};
-
-	let createdDate = '';
-
-	const form = {
-		type: 'noise',
-		signatures
-	} as unknown as INoiseForm;
 
 	let result = suite.get();
 
@@ -60,9 +66,9 @@
 
 			const { valuationsHandlers } = await import('$lib/store');
 
-			await valuationsHandlers.add(form);
+			await valuationsHandlers.update(currentUserStore.user.uid, valuationId ?? '', form);
 
-			await goto('../avaliacoes');
+			await goto('../');
 		}
 	};
 
@@ -91,6 +97,8 @@
 	const equipmentOptions = ['Usar Aparelho da Lista', 'Inserir Aparelho Manualmente'];
 	let equipmentList: (typeof equipmentOptions)[number] = equipmentOptions[0];
 	const resetEquipment = (_: any) => {
+		if (equipmentList === 'Usar Aparelho da Lista') return;
+
 		form.deviceBrand = '';
 		form.deviceModel = '';
 		form.deviceSerialNumber = '';
@@ -99,6 +107,8 @@
 	const calibrationOptions = ['Usar Calibração da Lista', 'Inserir Calibração Manualmente'];
 	let calibrationList: (typeof calibrationOptions)[number] = calibrationOptions[0];
 	const resetCalibration = (_: any) => {
+		if (calibrationList === 'Usar Calibração da Lista') return;
+
 		form.calibrationBrand = '';
 		form.calibrationModel = '';
 		form.calibrationSerialNumber = '';
@@ -114,7 +124,7 @@
 <div class="flex flex-col items-center my-0 mx-auto justify-center">
 	<div class="navbar bg-base-100">
 		<div class="flex-none">
-			<a href="../home">
+			<a href="../">
 				<button class="btn btn-square btn-ghost">
 					<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
 						><g id="SVGRepo_bgCarrier" stroke-width="0" /><g

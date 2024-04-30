@@ -1,8 +1,17 @@
 import type IHeatValuationDoc from '$lib/interfaces/firebase/docs';
 import type { IHeatForm } from '$lib/interfaces/forms/heat';
 import type { INoiseForm } from '$lib/interfaces/forms/noise';
-import { userStore, type UserStore } from '$lib/store';
-import { addDoc, collection, FirestoreError, getDocs, orderBy, query } from 'firebase/firestore';
+import { userStore, valuationStore, type UserStore } from '$lib/store';
+import {
+	addDoc,
+	collection,
+	doc,
+	FirestoreError,
+	getDocs,
+	orderBy,
+	query,
+	updateDoc
+} from 'firebase/firestore';
 import { db } from './firebase';
 import type { IVibrationForm } from '$lib/interfaces/forms/vibration';
 import type { IChemicalAgentsForm } from '$lib/interfaces/forms/chemicalAgents';
@@ -43,5 +52,13 @@ export const readValuations = async (userId: string) => {
 		data: { ...doc.data() }
 	})) as IHeatValuationDoc[];
 
+	valuationStore.set({ loading: false, userValuations: valuations });
+
 	return valuations;
+};
+
+export const updateValuations = async (userId: string, valuationId: string, form: object) => {
+	const valuationsRef = doc(db, 'technitians', userId, 'valuations', valuationId);
+
+	await updateDoc(valuationsRef, form);
 };
