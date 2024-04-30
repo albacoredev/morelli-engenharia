@@ -48,17 +48,17 @@
 
 	let rows: ITableRow[] = [];
 	let valuationsLoading = true;
-	let userDisplayName = currentUserStore?.user?.email?.split('@')[0] ?? '';
 	let currentValuation: string | undefined = undefined;
 	let image: HTMLImageElement;
 	let input: HTMLInputElement;
 
-	const downloadPDF = (form: IHeatForm) => {
-		const emailSplit = currentUserStore?.user?.email ?? ['sem', 'nome'];
-		const firstName = emailSplit[0].charAt(0).toUpperCase() + emailSplit[0].slice(1);
-		const lastName = emailSplit[1].charAt(0).toUpperCase() + emailSplit[1].slice(1);
-		const technitiansName = `${firstName} ${lastName}`;
+	const emailSplit = currentUserStore?.user?.email?.split('@')[0].split('.');
+	const nameArray = emailSplit && emailSplit.length > 1 ? emailSplit : ['sem', 'nome'];
+	const firstName = nameArray[0].charAt(0).toUpperCase() + nameArray[0].slice(1);
+	const lastName = nameArray[1].charAt(0).toUpperCase() + nameArray[1].slice(1);
+	const technitiansName = `${firstName} ${lastName}`;
 
+	const downloadPDF = (form: IHeatForm) => {
 		const url = generatePdf(form, technitiansName);
 
 		window.open(url, '_blank');
@@ -158,7 +158,7 @@
 		</a>
 	</div>
 	<div class="flex-1">
-		<span class="normal-case text-xl px-4">Avaliações de {userDisplayName}</span>
+		<span class="normal-case text-xl px-4">Avaliações de {technitiansName}</span>
 	</div>
 </div>
 

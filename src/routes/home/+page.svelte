@@ -8,9 +8,10 @@
 
 	userStore.subscribe((store) => (currentUserStore = store));
 
-	const emailSplit = currentUserStore?.user?.email?.split('@')[0].split('.') ?? ['', ''];
-	const firstName = emailSplit[0].charAt(0).toUpperCase() + emailSplit[0].slice(1);
-	const lastName = emailSplit[1].charAt(0).toUpperCase() + emailSplit[1].slice(1);
+	const emailSplit = currentUserStore?.user?.email?.split('@')[0].split('.');
+	const nameArray = emailSplit && emailSplit.length > 1 ? emailSplit : ['sem', 'nome'];
+	const firstName = nameArray[0].charAt(0).toUpperCase() + nameArray[0].slice(1);
+	const lastName = nameArray[1].charAt(0).toUpperCase() + nameArray[1].slice(1);
 	const technitiansName = `${firstName} ${lastName}`;
 	let greeting = '';
 
