@@ -221,6 +221,7 @@
 			>
 				<option disabled selected>Selecionar</option>
 				<option>Criffer</option>
+				<option>Gillian</option>
 			</select>
 		</div>
 		<div class="form-control w-full py-2">
@@ -236,6 +237,8 @@
 				<option disabled selected>Selecionar</option>
 				<option>Accura</option>
 				<option>Accura2</option>
+				<option>Gilian 3</option>
+				<option>BDXII</option>
 			</select>
 		</div>
 		<div class="form-control w-full py-2">
@@ -253,6 +256,8 @@
 				<option>17054204</option>
 				<option>17054299</option>
 				<option>19030112</option>
+				<option>15775</option>
+				<option>20181105027</option>
 			</select>
 		</div>
 
@@ -297,7 +302,7 @@
 				bind:value={form.calibrationBrand}
 			>
 				<option disabled selected>Selecionar</option>
-				<option>Gillian</option>
+				<option>Crifer</option>
 			</select>
 		</div>
 		<div class="form-control w-full py-2">
@@ -311,8 +316,7 @@
 				bind:value={form.calibrationModel}
 			>
 				<option disabled selected>Selecionar</option>
-				<option>BDXII</option>
-				<option>GilAir</option>
+				<option>CR4</option>
 			</select>
 		</div>
 		<div class="form-control w-full py-2">
@@ -326,8 +330,7 @@
 				bind:value={form.calibrationSerialNumber}
 			>
 				<option disabled selected>Selecionar</option>
-				<option>20181105027</option>
-				<option>15775</option>
+				<option>23001002</option>
 			</select>
 		</div>
 
