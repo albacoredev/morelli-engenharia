@@ -21,6 +21,7 @@
 		id: string;
 		type: keyof typeof EValuationTypesDisplayName;
 		company: string;
+		name: string | undefined;
 		createdAt: string;
 		formData: IHeatForm;
 	}
@@ -123,6 +124,7 @@
 				id: valuation.id,
 				type: valuation.data.type,
 				company: valuation.data.company === '' ? 'Não informado' : valuation.data.company,
+				name: valuation.data.name,
 				createdAt: valuation.data.date.toDate().toLocaleDateString('pt-BR'),
 				formData: valuation.data
 			};
@@ -168,6 +170,7 @@
 			<th>Tipo</th>
 			<th>Empresa</th>
 			<th>Criado</th>
+			<th>Funcionário</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -179,6 +182,7 @@
 					<td class="border-0">{EValuationTypesDisplayName[row.type]}</td>
 					<td class="border-0">{row.company}</td>
 					<td class="border-0">{row.createdAt}</td>
+					<td class="border-0">{row.name ?? 'Sem Nome'}</td>
 				</tr>
 				<div class="inline-flex p-2 gap-2">
 					<button
