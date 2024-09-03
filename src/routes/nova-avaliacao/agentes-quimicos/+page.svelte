@@ -222,6 +222,7 @@
 				<option disabled selected>Selecionar</option>
 				<option>Criffer</option>
 				<option>Gillian</option>
+				<option>Gillian - BDX II</option>
 			</select>
 		</div>
 		<div class="form-control w-full py-2">
@@ -239,6 +240,7 @@
 				<option>Accura2</option>
 				<option>Gilian 3</option>
 				<option>BDXII</option>
+				<option>Gillian - BDX II</option>
 			</select>
 		</div>
 		<div class="form-control w-full py-2">
@@ -258,6 +260,7 @@
 				<option>19030112</option>
 				<option>15775</option>
 				<option>20181105027</option>
+				<option>20240502087</option>
 			</select>
 		</div>
 
