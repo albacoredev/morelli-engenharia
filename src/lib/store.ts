@@ -16,7 +16,7 @@ export interface UserStore {
 
 export interface ValuationStore {
 	loading: boolean;
-	userValuations: IHeatValuationDoc[];
+	usersValuations: Array<{ email: string; valuations: IHeatValuationDoc[] }>;
 }
 
 export interface PhotosStore {
@@ -40,7 +40,7 @@ export const photosStore = writable<PhotosStore>({
 
 export const valuationStore = writable<ValuationStore>({
 	loading: true,
-	userValuations: []
+	usersValuations: []
 });
 
 export const authHandlers = {

@@ -36,8 +36,6 @@ export const downloadPhotos = async (valuationId?: string) => {
 			const urls = await Promise.all(items.map((item) => getDownloadURL(item)));
 			const names = await Promise.all(items.map((item) => item.name));
 
-			console.log(urls);
-
 			photosStore.update((curr) => ({
 				photosUrls: urls,
 				names,

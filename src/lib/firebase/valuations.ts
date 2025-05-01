@@ -7,9 +7,8 @@ import {
 	collection,
 	doc,
 	FirestoreError,
+	getDoc,
 	getDocs,
-	orderBy,
-	query,
 	updateDoc
 } from 'firebase/firestore';
 import { db } from './firebase';
@@ -39,22 +38,71 @@ export const addValuation = async (
 	}
 };
 
+export const ADMIN_ID = '5K6k30S4ZieJo62nf6jvHxz08DH3';
+
 export const readValuations = async (userId: string) => {
-	const valuationsRef = collection(db, 'technitians', userId, 'valuations');
-	const queryOrder = orderBy('date', 'desc');
+	const isAdmin = userId === ADMIN_ID;
 
-	const valuationsQuery = query(valuationsRef, queryOrder);
-	const valuationsSnapshot = await getDocs(valuationsQuery);
+	const allValuationsRef = collection(db, 'technitians');
+	const allValuationsSnapshot = await getDocs(allValuationsRef);
 
-	const documents = valuationsSnapshot.docs;
-	const valuations = documents.map((doc) => ({
-		id: doc.id,
-		data: { ...doc.data() }
-	})) as IHeatValuationDoc[];
+	const technitian = (await getDoc(doc(db, 'technitians', userId))).data();
 
-	valuationStore.set({ loading: false, userValuations: valuations });
+	if (!technitian?.email) {
+		let currentUserStore: UserStore = {
+			loading: true,
+			user: null
+		};
 
-	return valuations;
+		userStore.subscribe((store) => (currentUserStore = store));
+
+		if (currentUserStore.user?.email) {
+			await updateDoc(doc(db, 'technitians', userId), {
+				email: currentUserStore.user.email
+			});
+		}
+	}
+
+	const getValuations = () =>
+		allValuationsSnapshot.docs.map(async (doc) => {
+			const valuationsRef = collection(db, 'technitians', doc.id, 'valuations');
+			const valuationsSnapshot = await getDocs(valuationsRef);
+
+			const valuations = valuationsSnapshot.docs.map((valuation) => ({
+				id: valuation.id,
+				data: valuation.data()
+			})) as IHeatValuationDoc[];
+
+			return {
+				email: doc.data().email,
+				valuations
+			};
+		});
+
+	const getValuationsFromSingleUser = async (userId: string) => {
+		const valuationsRef = collection(db, 'technitians', userId, 'valuations');
+		const valuationsSnapshot = await getDocs(valuationsRef);
+		const emailRef = doc(db, 'technitians', userId);
+		const emailSnapshot = await getDoc(emailRef);
+
+		return [
+			{
+				email: emailSnapshot.data()?.email,
+				valuations: valuationsSnapshot.docs.map((valuation) => ({
+					id: valuation.id,
+					data: valuation.data()
+				})) as IHeatValuationDoc[]
+			}
+		];
+	};
+
+	const allValuations = isAdmin
+		? await Promise.all(getValuations())
+		: await getValuationsFromSingleUser(userId);
+
+	valuationStore.set({ loading: false, usersValuations: allValuations });
+
+	return allValuations;
 };
 
 export const updateValuations = async (userId: string, valuationId: string, form: object) => {

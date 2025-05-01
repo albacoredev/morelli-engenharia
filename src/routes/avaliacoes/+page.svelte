@@ -2,6 +2,7 @@
 	import Loading from '$lib/components/Loading.svelte';
 	import PhotoItem from '$lib/components/PhotoItem.svelte';
 	import { downloadPhotos, uploadPhoto } from '$lib/firebase/photos';
+	import { ADMIN_ID } from '$lib/firebase/valuations';
 	import { EValuationTypesDisplayName, EValuationsRoutes } from '$lib/interfaces/forms/common';
 	import type { IHeatForm } from '$lib/interfaces/forms/heat';
 	import {
@@ -24,6 +25,7 @@
 		name: string | undefined;
 		createdAt: string;
 		formData: IHeatForm;
+		createdBy: string;
 	}
 
 	let currentUserStore: UserStore = {
@@ -33,7 +35,7 @@
 
 	let currentValuationStore: ValuationStore = {
 		loading: false,
-		userValuations: []
+		usersValuations: []
 	};
 
 	let currentPhotosStore: PhotosStore = {
@@ -49,7 +51,6 @@
 
 	let rows: ITableRow[] = [];
 	let valuationsLoading = true;
-	let currentValuation: string | undefined = undefined;
 	let image: HTMLImageElement;
 	let input: HTMLInputElement;
 
@@ -59,22 +60,25 @@
 	const lastName = nameArray[1].charAt(0).toUpperCase() + nameArray[1].slice(1);
 	const technitiansName = `${firstName} ${lastName}`;
 
+	let selectedUser: string | undefined = undefined;
+	let filteredRows: ITableRow[] = [];
+	let selectedValuation: ITableRow | undefined = undefined;
+
 	const downloadPDF = (form: IHeatForm) => {
 		const url = generatePdf(form, technitiansName);
 
 		window.open(url, '_blank');
 	};
 
-	const openPhotosDialog = (valuationId: string) => {
-		currentValuation = valuationId;
+	const openPhotosDialog = () => {
 		window.photoModal.showModal();
-		downloadPhotos(valuationId);
+		downloadPhotos(selectedValuation?.id ?? '');
 	};
 
-	const getPhotosUrls = (valuationId: string) => {
-		if (!valuationId) return;
+	const getPhotosUrls = () => {
+		if (!selectedValuation) return;
 
-		photosHandlers.read(valuationId);
+		photosHandlers.read(selectedValuation.id);
 	};
 
 	const onSelectImage = () => {
@@ -102,9 +106,9 @@
 
 		const reader = new FileReader();
 		reader.addEventListener('load', () => {
-			if (!currentValuation || !reader.result) return;
+			if (!selectedValuation || !reader.result) return;
 
-			uploadPhoto(`${reader.result}`.split(',')[1], currentValuation);
+			uploadPhoto(`${reader.result}`.split(',')[1], selectedValuation.id);
 		});
 		reader.readAsDataURL(file);
 	};
@@ -113,25 +117,38 @@
 		image.setAttribute('src', '#');
 	};
 
+	const updateRows = (user: string | undefined) => {
+		if (user === 'TODOS' || user === undefined) {
+			filteredRows = rows;
+		} else {
+			filteredRows = rows.filter((row) => row.createdBy === user);
+		}
+	};
+
 	onMount(async () => {
 		if (!currentUserStore.user) return;
 
 		const valuations = await valuationsHandlers.read(currentUserStore.user.uid);
 		valuationsLoading = false;
 
-		rows = valuations.map((valuation) => {
-			return {
-				id: valuation.id,
-				type: valuation.data.type,
-				company: valuation.data.company === '' ? 'Não informado' : valuation.data.company,
-				name: valuation.data.name,
-				createdAt: valuation.data.date.toDate().toLocaleDateString('pt-BR'),
-				formData: valuation.data
-			};
-		});
+		rows = valuations
+			.map((user) =>
+				user.valuations.map((valuation) => ({
+					id: valuation.id,
+					type: valuation.data.type,
+					company: valuation.data.company === '' ? 'Não informado' : valuation.data.company,
+					name: valuation.data.name,
+					createdAt: valuation.data.date.toDate().toLocaleDateString('pt-BR'),
+					formData: valuation.data,
+					createdBy: user.email
+				}))
+			)
+			.flat();
 	});
 
-	$: currentValuation && getPhotosUrls(currentValuation);
+	$: selectedValuation && getPhotosUrls();
+	$: rows && updateRows(selectedUser);
+	$: selectedUser && (selectedValuation = undefined);
 </script>
 
 <div class="navbar bg-base-100">
@@ -164,9 +181,50 @@
 	</div>
 </div>
 
-<table class="table-fixed w-full">
+<div class="py-8 flex flex-col gap-4">
+	{#if selectedValuation}
+		<div class="inline-flex gap-2 w-full justify-center">
+			<span>{selectedValuation.createdAt}</span>
+			<span>{selectedValuation.company}</span>
+			{#if selectedUser !== undefined && selectedUser !== 'TODOS'}
+				<span>{selectedValuation.createdBy}</span>
+			{/if}
+		</div>
+	{/if}
+	<div class="inline-flex gap-2 w-full justify-center">
+		<button
+			class="btn btn-primary btn-sm"
+			disabled={!selectedValuation}
+			on:click={() => selectedValuation && downloadPDF(selectedValuation.formData)}>PDF</button
+		>
+		<button
+			disabled={!selectedValuation}
+			class="btn btn-sm btn-primary"
+			on:click={() => {
+				openPhotosDialog();
+			}}>fotos</button
+		>
+		<a href="avaliacoes/123/heat"
+			><button class="btn btn-primary btn-sm" disabled={!selectedValuation}>editar</button></a
+		>
+		{#if currentUserStore.user?.uid === ADMIN_ID}
+			<select class="select select-primary select-sm" bind:value={selectedUser}>
+				<option selected value="TODOS">TODOS</option>
+				{#each currentValuationStore.usersValuations as user}
+					<option value={user.email}>{user.email.split('@')[0]}</option>
+				{/each}
+			</select>
+		{/if}
+	</div>
+</div>
+
+<table class="table w-full table-compact">
 	<thead>
 		<tr>
+			<th />
+			{#if selectedUser === 'TODOS'}
+				<th>Criado Por</th>
+			{/if}
 			<th>Tipo</th>
 			<th>Empresa</th>
 			<th>Criado</th>
@@ -177,31 +235,29 @@
 		{#if valuationsLoading}
 			<Loading />
 		{:else}
-			{#each rows as row}
+			{#each filteredRows as row}
 				<tr class="border-solid border-t-2 border-secondary">
+					<td class="border-0"
+						><input
+							on:change={(e) => {
+								if (e.currentTarget.checked) {
+									selectedValuation = row;
+								}
+							}}
+							checked={selectedValuation?.id === row.id}
+							type="radio"
+							name="radio-1"
+							class="radio"
+						/>
+					</td>
+					{#if selectedUser === 'TODOS'}
+						<td class="border-0">{row.createdBy}</td>
+					{/if}
 					<td class="border-0">{EValuationTypesDisplayName[row.type]}</td>
 					<td class="border-0">{row.company}</td>
 					<td class="border-0">{row.createdAt}</td>
 					<td class="border-0">{row.name ?? 'Sem Nome'}</td>
 				</tr>
-				<div class="inline-flex p-2 gap-2">
-					<button
-						class="btn btn-primary btn-sm"
-						on:click={() => {
-							downloadPDF(row.formData);
-						}}>PDF</button
-					>
-					<button
-						class="btn btn-sm btn-primary"
-						on:click={() => {
-							openPhotosDialog(row.id);
-						}}>fotos</button
-					>
-
-					<a href="avaliacoes/{row.id}/{EValuationsRoutes[row.type]}"
-						><button class="btn btn-primary btn-outline btn-sm">editar</button></a
-					>
-				</div>
 			{/each}
 		{/if}
 	</tbody>
@@ -232,7 +288,7 @@
 					{#each currentPhotosStore.photosUrls as url, i}
 						<PhotoItem
 							src={url}
-							valuation={currentValuation ?? ''}
+							valuation={selectedValuation?.id ?? ''}
 							name={currentPhotosStore.names?.[i] ?? ''}
 						/>
 					{/each}

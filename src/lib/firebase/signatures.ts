@@ -17,7 +17,5 @@ export const uploadBase64Signature = async (
 
 	const storageRef = ref(storage, `signatures/${valuationId}_${holder}`);
 
-	uploadString(storageRef, base64, 'base64', metadata).then((snapshot) =>
-		console.log('File uploaded', snapshot)
-	);
+	uploadString(storageRef, base64, 'base64', metadata);
 };
