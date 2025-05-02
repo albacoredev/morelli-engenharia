@@ -186,7 +186,7 @@
 		<div class="inline-flex gap-2 w-full justify-center">
 			<span>{selectedValuation.createdAt}</span>
 			<span>{selectedValuation.company}</span>
-			{#if selectedUser !== undefined && selectedUser !== 'TODOS'}
+			{#if selectedUser !== undefined || selectedUser !== 'TODOS'}
 				<span>{selectedValuation.createdBy}</span>
 			{/if}
 		</div>
@@ -204,7 +204,9 @@
 				openPhotosDialog();
 			}}>fotos</button
 		>
-		<a href="avaliacoes/123/heat"
+		<a
+			href="avaliacoes/123/heat"
+			style={selectedValuation ? 'pointer-events: auto' : 'pointer-events: none'}
 			><button class="btn btn-primary btn-sm" disabled={!selectedValuation}>editar</button></a
 		>
 		{#if currentUserStore.user?.uid === ADMIN_ID}
