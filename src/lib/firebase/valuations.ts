@@ -9,6 +9,7 @@ import {
 	FirestoreError,
 	getDoc,
 	getDocs,
+	setDoc,
 	updateDoc
 } from 'firebase/firestore';
 import { db } from './firebase';
@@ -38,7 +39,7 @@ export const addValuation = async (
 	}
 };
 
-export const ADMIN_ID = '5K6k30S4ZieJo62nf6jvHxz08DH3';
+export const ADMIN_ID = '2G8P3pCF8zdMgCbtMmoTXYmCeFt1';
 
 export const readValuations = async (userId: string) => {
 	const isAdmin = userId === ADMIN_ID;
@@ -46,21 +47,24 @@ export const readValuations = async (userId: string) => {
 	const allValuationsRef = collection(db, 'technitians');
 	const allValuationsSnapshot = await getDocs(allValuationsRef);
 
-	const technitian = (await getDoc(doc(db, 'technitians', userId))).data();
+	const technitianRef = doc(db, 'technitians', userId);
+	const technitian = (await getDoc(technitianRef)).data();
 
-	if (!technitian?.email) {
-		let currentUserStore: UserStore = {
-			loading: true,
-			user: null
-		};
+	let currentUserStore: UserStore = {
+		loading: true,
+		user: null
+	};
 
-		userStore.subscribe((store) => (currentUserStore = store));
+	userStore.subscribe((store) => (currentUserStore = store));
 
+	if (technitian && !technitian.email) {
 		if (currentUserStore.user?.email) {
-			await updateDoc(doc(db, 'technitians', userId), {
+			await updateDoc(technitianRef, {
 				email: currentUserStore.user.email
 			});
 		}
+	} else if (!technitian) {
+		await setDoc(doc(db, 'technitians', userId), { email: currentUserStore.user?.email });
 	}
 
 	const getValuations = () =>
