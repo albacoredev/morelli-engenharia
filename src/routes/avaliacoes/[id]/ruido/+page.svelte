@@ -20,15 +20,16 @@
 
 	userStore.subscribe((store) => (currentUserStore = store));
 
-	userStore.subscribe((store) => (currentUserStore = store));
-
 	let currentValuationStore = {} as ValuationStore;
 	valuationStore.subscribe((v) => (currentValuationStore = v));
 
 	const valuationId = $page.url.href.split('/').at(-2);
 
-	const form = currentValuationStore.userValuations.filter((v) => v.id == valuationId)[0]
-		.data as unknown as INoiseForm;
+	const userEmail = currentUserStore.user?.email ?? '';
+
+	const form = currentValuationStore.usersValuations
+		.find((obj) => obj.email === userEmail)
+		?.valuations.find((v) => v.id === valuationId)?.data as unknown as INoiseForm;
 
 	let createdDate = new Intl.DateTimeFormat('pt-BR').format(form.date.toDate());
 
