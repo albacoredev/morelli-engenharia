@@ -205,7 +205,7 @@
 			}}>fotos</button
 		>
 		<a
-			href="avaliacoes/123/heat"
+			href={`avaliacoes/${selectedValuation?.id}/${selectedValuation?.type}`}
 			style={selectedValuation ? 'pointer-events: auto' : 'pointer-events: none'}
 			><button class="btn btn-primary btn-sm" disabled={!selectedValuation}>editar</button></a
 		>
